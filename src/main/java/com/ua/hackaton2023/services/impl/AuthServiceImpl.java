@@ -1,5 +1,6 @@
 package com.ua.hackaton2023.services.impl;
 
+import com.ua.hackaton2023.entity.Role;
 import com.ua.hackaton2023.entity.User;
 import com.ua.hackaton2023.exceptions.UserAlreadyExistsException;
 import com.ua.hackaton2023.repository.UserRepository;
@@ -22,7 +23,8 @@ public class AuthServiceImpl implements AuthService {
         }
         User user = new User(
                 userDto.getUsername(),
-                passwordEncoder.encode(userDto.getPassword())
+                passwordEncoder.encode(userDto.getPassword()),
+                Role.valueOf(userDto.getRole())
         );
         userRepository.save(user);
         return user;
