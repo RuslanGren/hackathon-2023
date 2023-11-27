@@ -13,4 +13,6 @@ public class UserDto {
     @NotBlank(message = "Пароль не повинний бути пустим!")
     @Size(min = 4, max = 16, message = "Розмір пароля повинний бути між 4 і 16 символами!")
     private String password;
+
+    private String role;
 }
