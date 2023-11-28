@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
+
 @Getter
 @Setter
 @Builder
@@ -19,13 +21,14 @@ public class Cargo {
     private String description;
     private double weight;
     private double volume;
+    private String insurance;
     @Column(name = "start_address")
     private String startAddress;
     @Column(name = "end_address")
     private String endAddress;
     @Column(name = "is_active")
     private boolean isActive;
-    private String insurance;
+    private LocalDate date;
 
     @ManyToOne
     @JoinColumn(name = "customer_id")

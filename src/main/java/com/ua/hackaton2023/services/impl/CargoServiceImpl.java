@@ -9,6 +9,8 @@ import com.ua.hackaton2023.web.cargo.CargoDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+
 @Service
 @RequiredArgsConstructor
 public class CargoServiceImpl implements CargoService {
@@ -26,6 +28,7 @@ public class CargoServiceImpl implements CargoService {
                 .insurance(cargoDto.getInsurance())
                 .customer(customer)
                 .isActive(true)
+                .date(LocalDate.now())
                 .build();
     }
 

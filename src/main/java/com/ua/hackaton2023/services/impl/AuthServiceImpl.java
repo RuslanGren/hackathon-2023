@@ -3,6 +3,7 @@ package com.ua.hackaton2023.services.impl;
 import com.ua.hackaton2023.entity.Role;
 import com.ua.hackaton2023.entity.User;
 import com.ua.hackaton2023.exceptions.user.NotRoleExists;
+import com.ua.hackaton2023.exceptions.user.PasswordBadRequestException;
 import com.ua.hackaton2023.exceptions.user.UserAlreadyExistsException;
 import com.ua.hackaton2023.repository.UserRepository;
 import com.ua.hackaton2023.services.AuthService;
@@ -25,6 +26,9 @@ public class AuthServiceImpl implements AuthService {
     public User register(UserDto userDto) {
         if (userRepository.findByUsername(userDto.getUsername()).isPresent()) {
             throw new UserAlreadyExistsException();
+        }
+        if (!userDto.getPassword().equals(userDto.getRepeatedPassword())) {
+            throw new PasswordBadRequestException();
         }
         String role = userDto.getRole();
         User user = new User(
