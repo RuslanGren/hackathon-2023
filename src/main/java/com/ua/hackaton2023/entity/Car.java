@@ -2,37 +2,28 @@ package com.ua.hackaton2023.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
-@Setter
+@Data
+@Entity
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "cargos")
-public class Cargo {
+@Table(name = "cars")
+public class Car {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    private String description;
     private double weight;
     private double volume;
-    @Column(name = "start_address")
-    private String startAddress;
-    @Column(name = "end_address")
-    private String endAddress;
-    @Column(name = "is_active")
-    private boolean isActive;
     private String insurance;
 
     @ManyToOne
-    @JoinColumn(name = "customer_id")
-    @JsonBackReference
-    private Customer customer;
-
-    @ManyToOne
     @JoinColumn(name = "carrier_id")
+    @JsonBackReference
     private Carrier carrier;
 }
