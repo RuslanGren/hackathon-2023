@@ -1,17 +1,29 @@
 package com.ua.hackaton2023.web.controllers;
 
+import com.ua.hackaton2023.entity.Customer;
+import com.ua.hackaton2023.services.CustomerService;
+import com.ua.hackaton2023.web.cargo.CargoDto;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/customer")
 public class CustomerController {
+    private final CustomerService customerService;
+
+    @GetMapping("/get/all")
+    public ResponseEntity<List<Customer>> getAll() {
+        return new ResponseEntity<>(customerService.getAll(), HttpStatus.OK);
+    }
 
     @PostMapping("/add/cargo")
-    public ResponseEntity<String> addCargo() {
-        return new ResponseEntity<>("SUCCESSFUL", HttpStatus.OK);
+    public ResponseEntity<Customer> addCargo(@Valid @RequestBody CargoDto cargoDto) {
+        return new ResponseEntity<>(customerService.addCargo(cargoDto), HttpStatus.OK);
     }
 }

@@ -1,6 +1,6 @@
 package com.ua.hackaton2023.config;
 
-import com.ua.hackaton2023.exceptions.UserNotFoundException;
+import com.ua.hackaton2023.exceptions.user.UserNotFoundException;
 import com.ua.hackaton2023.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
