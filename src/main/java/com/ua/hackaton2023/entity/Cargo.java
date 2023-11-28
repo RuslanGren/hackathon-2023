@@ -1,12 +1,11 @@
 package com.ua.hackaton2023.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -20,11 +19,16 @@ public class Cargo {
     private String description;
     private double weight;
     private double volume;
+    @Column(name = "start_address")
     private String startAddress;
+    @Column(name = "end_address")
     private String endAddress;
+    @Column(name = "is_active")
+    private boolean isActive;
 
     @ManyToOne
     @JoinColumn(name = "customer_id")
+    @JsonBackReference
     private Customer customer;
 
     @ManyToOne

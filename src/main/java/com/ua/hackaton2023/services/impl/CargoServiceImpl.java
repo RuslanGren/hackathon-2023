@@ -8,8 +8,6 @@ import com.ua.hackaton2023.web.cargo.CargoDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class CargoServiceImpl implements CargoService {
@@ -25,6 +23,7 @@ public class CargoServiceImpl implements CargoService {
                 .startAddress(cargoDto.getStartAddress())
                 .endAddress(cargoDto.getEndAddress())
                 .customer(customer)
+                .isActive(true)
                 .build();
     }
 

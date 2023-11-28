@@ -16,10 +16,7 @@ public class Customer {
     private Long id;
 
     @OneToMany(mappedBy = "customer")
-    private List<Cargo> activeCargos;
-
-    @OneToMany(mappedBy = "customer")
-    private List<Cargo> historyCargos;
+    private List<Cargo> cargoList;
 
     @OneToOne
     @JoinColumn(name = "user_id")

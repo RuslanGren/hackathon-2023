@@ -16,7 +16,7 @@ public class Carrier {
     private Long id;
 
     @OneToMany(mappedBy = "carrier")
-    private List<Cargo> historyCargos;
+    private List<Cargo> cargosList;
 
     @OneToOne
     @JoinColumn(name = "user_id")

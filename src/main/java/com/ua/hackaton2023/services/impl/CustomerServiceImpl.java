@@ -31,9 +31,9 @@ public class CustomerServiceImpl implements CustomerService {
         Cargo cargo = cargoService.createCargo(cargoDto, customer);
         cargoService.saveCargo(cargo);
 
-        List<Cargo> activeCargos = customer.getActiveCargos();
-        activeCargos.add(cargo);
-        customer.setActiveCargos(activeCargos);
+        List<Cargo> cargoList = customer.getCargoList();
+        cargoList.add(cargo);
+        customer.setCargoList(cargoList);
         return customerRepository.save(customer);
     }
 
