@@ -7,9 +7,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -17,13 +17,11 @@ import java.util.List;
 public class CustomerController {
     private final CustomerService customerService;
 
-    @GetMapping("/get/all")
-    public ResponseEntity<List<Customer>> getAll() {
-        return new ResponseEntity<>(customerService.getAll(), HttpStatus.OK);
-    }
-
     @PostMapping("/add/cargo")
-    public ResponseEntity<Customer> addCargo(@Valid @RequestBody CargoDto cargoDto, @RequestParam("id") Long id) {
-        return new ResponseEntity<>(customerService.addCargo(cargoDto, id), HttpStatus.OK);
+    public ResponseEntity<Customer> addCargo(
+            @Valid @RequestBody CargoDto cargoDto,
+            @AuthenticationPrincipal UserDetails userDetails
+            ) {
+        return new ResponseEntity<>(customerService.addCargo(cargoDto, userDetails), HttpStatus.OK);
     }
 }

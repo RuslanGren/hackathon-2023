@@ -7,6 +7,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,26 +19,36 @@ import java.util.List;
 public class CarrierController {
     private final CarrierService carrierService;
 
-    @GetMapping("/test")
-    public ResponseEntity<String> test() {
-        return new ResponseEntity<>("YES COOL", HttpStatus.OK);
-    }
-
     @PatchMapping("/cargo/pick")
     public ResponseEntity<Carrier> pickCargo(
             @RequestParam("cargoId") Long cargoId,
-            @RequestParam("carrierId") Long carrierId
+            @AuthenticationPrincipal UserDetails userDetails
     ) {
-        return new ResponseEntity<>(carrierService.pickCargo(cargoId, carrierId), HttpStatus.OK);
+        return new ResponseEntity<>(carrierService.pickCargo(cargoId, userDetails), HttpStatus.OK);
     }
 
     @PostMapping("/add/car")
-    public ResponseEntity<Carrier> addCar(@Valid @RequestBody CarDto carDto, @RequestParam("id") Long id) {
-        return new ResponseEntity<>(carrierService.addCar(carDto, id), HttpStatus.OK);
+    public ResponseEntity<Carrier> addCar(
+            @Valid @RequestBody CarDto carDto,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        return new ResponseEntity<>(carrierService.addCar(carDto, userDetails), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/delete/car")
+    public ResponseEntity<?> deleteCar(
+            @RequestParam("carId") Long carId,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        carrierService.deleteCar(carId, userDetails);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/add/cars")
-    public ResponseEntity<Carrier> addCars(@Valid @RequestBody List<CarDto> carDtos, @RequestParam("id") Long id) {
-        return new ResponseEntity<>(carrierService.addCars(carDtos, id), HttpStatus.OK);
+    public ResponseEntity<Carrier> addCars(
+            @Valid @RequestBody List<CarDto> carDtos,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        return new ResponseEntity<>(carrierService.addCars(carDtos, userDetails), HttpStatus.OK);
     }
 }

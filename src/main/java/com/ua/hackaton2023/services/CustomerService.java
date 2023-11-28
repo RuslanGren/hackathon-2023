@@ -3,15 +3,12 @@ package com.ua.hackaton2023.services;
 import com.ua.hackaton2023.entity.Customer;
 import com.ua.hackaton2023.entity.User;
 import com.ua.hackaton2023.web.cargo.CargoDto;
-
-import java.util.List;
+import org.springframework.security.core.userdetails.UserDetails;
 
 public interface CustomerService {
-    Customer getCustomerById(Long id);
+    Customer getCustomerByUserDetails(UserDetails userDetails);
 
-    Customer addCargo(CargoDto cargoDto, Long id);
-
-    List<Customer> getAll();
+    Customer addCargo(CargoDto cargoDto, UserDetails userDetails);
 
     Customer addCustomer(User user);
 }

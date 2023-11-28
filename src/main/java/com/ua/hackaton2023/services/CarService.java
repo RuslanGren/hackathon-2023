@@ -14,4 +14,8 @@ public interface CarService {
     List<Car> createCars(List<CarDto> carDtos, Carrier carrier);
 
     void saveCars(List<Car> cars);
+
+    void deleteCar(Car car);
+
+    Car getCarById(Long id);
 }

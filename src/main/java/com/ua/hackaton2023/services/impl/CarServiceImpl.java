@@ -2,6 +2,7 @@ package com.ua.hackaton2023.services.impl;
 
 import com.ua.hackaton2023.entity.Car;
 import com.ua.hackaton2023.entity.Carrier;
+import com.ua.hackaton2023.exceptions.car.CarNotFoundException;
 import com.ua.hackaton2023.repository.CarRepository;
 import com.ua.hackaton2023.services.CarService;
 import com.ua.hackaton2023.web.carrier.CarDto;
@@ -47,5 +48,15 @@ public class CarServiceImpl implements CarService {
             throw new NullPointerException();
         }
         carRepository.saveAll(cars);
+    }
+
+    @Override
+    public void deleteCar(Car car) {
+        carRepository.delete(car);
+    }
+
+    @Override
+    public Car getCarById(Long id) {
+        return carRepository.findById(id).orElseThrow(CarNotFoundException::new);
     }
 }

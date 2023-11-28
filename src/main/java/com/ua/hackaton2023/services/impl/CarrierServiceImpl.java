@@ -4,13 +4,13 @@ import com.ua.hackaton2023.entity.Car;
 import com.ua.hackaton2023.entity.Cargo;
 import com.ua.hackaton2023.entity.Carrier;
 import com.ua.hackaton2023.entity.User;
-import com.ua.hackaton2023.exceptions.carrier.CarrierNotFoundException;
 import com.ua.hackaton2023.repository.CarrierRepository;
 import com.ua.hackaton2023.services.CarService;
 import com.ua.hackaton2023.services.CargoService;
 import com.ua.hackaton2023.services.CarrierService;
 import com.ua.hackaton2023.web.carrier.CarDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,8 +31,8 @@ public class CarrierServiceImpl implements CarrierService {
     }
 
     @Override
-    public Carrier addCar(CarDto carDto, Long id) {
-        Carrier carrier = getCarrierById(id);
+    public Carrier addCar(CarDto carDto, UserDetails userDetails) {
+        Carrier carrier = getCarrierByUserDetails(userDetails);
 
         Car car = carService.createCar(carDto, carrier);
         carService.saveCar(car);
@@ -44,13 +44,13 @@ public class CarrierServiceImpl implements CarrierService {
     }
 
     @Override
-    public Carrier getCarrierById(Long id) {
-        return carrierRepository.findById(id).orElseThrow(CarrierNotFoundException::new);
+    public Carrier getCarrierByUserDetails(UserDetails userDetails) {
+        return carrierRepository.findByUser((User) userDetails);
     }
 
     @Override
-    public Carrier addCars(List<CarDto> carDtos, Long id) {
-        Carrier carrier = getCarrierById(id);
+    public Carrier addCars(List<CarDto> carDtos, UserDetails userDetails) {
+        Carrier carrier = getCarrierByUserDetails(userDetails);
 
         List<Car> carList = carService.createCars(carDtos, carrier);
         carService.saveCars(carList);
@@ -62,8 +62,8 @@ public class CarrierServiceImpl implements CarrierService {
     }
 
     @Override
-    public Carrier pickCargo(Long cargoId, Long carrierId) {
-        Carrier carrier = getCarrierById(carrierId);
+    public Carrier pickCargo(Long cargoId, UserDetails userDetails) {
+        Carrier carrier = getCarrierByUserDetails(userDetails);
 
         Cargo cargo = cargoService.getCargoById(cargoId);
         cargo.setCarrier(carrier);
@@ -73,5 +73,17 @@ public class CarrierServiceImpl implements CarrierService {
         cargos.add(cargo);
         carrier.setCargosList(cargos);
         return carrierRepository.save(carrier);
+    }
+
+    @Override
+    public void deleteCar(Long carId, UserDetails userDetails) {
+        Carrier carrier = getCarrierByUserDetails(userDetails);
+        Car car = carService.getCarById(carId);
+        List<Car> cars = carrier.getCars();
+        cars.remove(car);
+        carrier.setCars(cars);
+
+        carService.deleteCar(car);
+        carrierRepository.save(carrier);
     }
 }
