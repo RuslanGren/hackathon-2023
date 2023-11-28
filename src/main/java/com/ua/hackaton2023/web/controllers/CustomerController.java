@@ -17,11 +17,20 @@ import org.springframework.web.bind.annotation.*;
 public class CustomerController {
     private final CustomerService customerService;
 
-    @PostMapping("/add/cargo")
+    @PostMapping("/cargo/add")
     public ResponseEntity<Customer> addCargo(
             @Valid @RequestBody CargoDto cargoDto,
             @AuthenticationPrincipal UserDetails userDetails
             ) {
         return new ResponseEntity<>(customerService.addCargo(cargoDto, userDetails), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/cargo/delete")
+    public ResponseEntity<?> deleteCargo(
+        @RequestParam("cargoId") Long cargoId,
+        @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        customerService.deleteCargo(cargoId, userDetails);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

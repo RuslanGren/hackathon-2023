@@ -11,4 +11,6 @@ public interface CustomerService {
     Customer addCargo(CargoDto cargoDto, UserDetails userDetails);
 
     Customer addCustomer(User user);
+
+    void deleteCargo(Long cargoId, UserDetails userDetails);
 }

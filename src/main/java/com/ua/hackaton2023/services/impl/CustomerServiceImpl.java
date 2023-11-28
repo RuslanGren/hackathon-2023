@@ -3,6 +3,7 @@ package com.ua.hackaton2023.services.impl;
 import com.ua.hackaton2023.entity.Cargo;
 import com.ua.hackaton2023.entity.Customer;
 import com.ua.hackaton2023.entity.User;
+import com.ua.hackaton2023.exceptions.customer.CustomerCargoAccessDeniedException;
 import com.ua.hackaton2023.repository.CustomerRepository;
 import com.ua.hackaton2023.services.CargoService;
 import com.ua.hackaton2023.services.CustomerService;
@@ -43,5 +44,19 @@ public class CustomerServiceImpl implements CustomerService {
             throw new NullPointerException();
         }
         return customerRepository.save(new Customer(user));
+    }
+
+    @Override
+    public void deleteCargo(Long cargoId, UserDetails userDetails) {
+        Cargo cargo = cargoService.getCargoById(cargoId);
+        Customer customer = getCustomerByUserDetails(userDetails);
+        if (!cargo.getCustomer().equals(customer)) {
+            throw new CustomerCargoAccessDeniedException();
+        }
+        List<Cargo> cargos = customer.getCargoList();
+        cargos.remove(cargo);
+        customer.setCargoList(cargos);
+        customerRepository.save(customer);
+        cargoService.removeCargo(cargo);
     }
 }

@@ -41,4 +41,9 @@ public class CargoServiceImpl implements CargoService {
     public Cargo getCargoById(Long id) {
         return cargoRepository.findById(id).orElseThrow(CargoNotFoundException::new);
     }
+
+    @Override
+    public void removeCargo(Cargo cargo) {
+        cargoRepository.delete(cargo);
+    }
 }
