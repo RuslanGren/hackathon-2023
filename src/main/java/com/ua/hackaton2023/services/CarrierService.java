@@ -10,9 +10,11 @@ import java.util.List;
 public interface CarrierService {
     Carrier addCarrier(User user);
 
-    Carrier addCar(CarDto carDto);
+    Carrier addCar(CarDto carDto, Long id);
 
     Carrier getCarrierById(Long id);
 
-    Carrier addCars(List<CarDto> carDtos);
+    Carrier addCars(List<CarDto> carDtos, Long id);
+
+    Carrier pickCargo(Long cargoId, Long carrierId);
 }

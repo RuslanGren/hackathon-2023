@@ -25,8 +25,8 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public Customer addCargo(CargoDto cargoDto) {
-        Customer customer = getCustomerById(cargoDto.getCustomerId());
+    public Customer addCargo(CargoDto cargoDto, Long id) {
+        Customer customer = getCustomerById(id);
 
         Cargo cargo = cargoService.createCargo(cargoDto, customer);
         cargoService.saveCargo(cargo);

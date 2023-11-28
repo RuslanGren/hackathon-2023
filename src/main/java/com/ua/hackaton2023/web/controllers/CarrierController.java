@@ -22,13 +22,21 @@ public class CarrierController {
         return new ResponseEntity<>("YES COOL", HttpStatus.OK);
     }
 
+    @PatchMapping("/cargo/pick")
+    public ResponseEntity<Carrier> pickCargo(
+            @RequestParam("cargoId") Long cargoId,
+            @RequestParam("carrierId") Long carrierId
+    ) {
+        return new ResponseEntity<>(carrierService.pickCargo(cargoId, carrierId), HttpStatus.OK);
+    }
+
     @PostMapping("/add/car")
-    public ResponseEntity<Carrier> addCar(@Valid @RequestBody CarDto carDto) {
-        return new ResponseEntity<>(carrierService.addCar(carDto), HttpStatus.OK);
+    public ResponseEntity<Carrier> addCar(@Valid @RequestBody CarDto carDto, @RequestParam("id") Long id) {
+        return new ResponseEntity<>(carrierService.addCar(carDto, id), HttpStatus.OK);
     }
 
     @PostMapping("/add/cars")
-    public ResponseEntity<Carrier> addCars(@Valid @RequestBody List<CarDto> carDtos) {
-        return new ResponseEntity<>(carrierService.addCars(carDtos), HttpStatus.OK);
+    public ResponseEntity<Carrier> addCars(@Valid @RequestBody List<CarDto> carDtos, @RequestParam("id") Long id) {
+        return new ResponseEntity<>(carrierService.addCars(carDtos, id), HttpStatus.OK);
     }
 }

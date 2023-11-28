@@ -23,7 +23,7 @@ public class CustomerController {
     }
 
     @PostMapping("/add/cargo")
-    public ResponseEntity<Customer> addCargo(@Valid @RequestBody CargoDto cargoDto) {
-        return new ResponseEntity<>(customerService.addCargo(cargoDto), HttpStatus.OK);
+    public ResponseEntity<Customer> addCargo(@Valid @RequestBody CargoDto cargoDto, @RequestParam("id") Long id) {
+        return new ResponseEntity<>(customerService.addCargo(cargoDto, id), HttpStatus.OK);
     }
 }

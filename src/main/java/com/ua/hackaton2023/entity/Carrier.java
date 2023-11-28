@@ -22,6 +22,7 @@ public class Carrier {
     private List<Car> cars;
 
     @OneToMany(mappedBy = "carrier")
+    @JsonManagedReference
     private List<Cargo> cargosList;
 
     @OneToOne

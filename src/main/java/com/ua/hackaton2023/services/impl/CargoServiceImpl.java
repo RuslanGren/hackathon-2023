@@ -2,6 +2,7 @@ package com.ua.hackaton2023.services.impl;
 
 import com.ua.hackaton2023.entity.Cargo;
 import com.ua.hackaton2023.entity.Customer;
+import com.ua.hackaton2023.exceptions.cargo.CargoNotFoundException;
 import com.ua.hackaton2023.repository.CargoRepository;
 import com.ua.hackaton2023.services.CargoService;
 import com.ua.hackaton2023.web.cargo.CargoDto;
@@ -34,5 +35,10 @@ public class CargoServiceImpl implements CargoService {
             throw new NullPointerException();
         }
         cargoRepository.save(cargo);
+    }
+
+    @Override
+    public Cargo getCargoById(Long id) {
+        return cargoRepository.findById(id).orElseThrow(CargoNotFoundException::new);
     }
 }

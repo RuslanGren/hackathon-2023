@@ -9,7 +9,7 @@ import java.util.List;
 public interface CustomerService {
     Customer getCustomerById(Long id);
 
-    Customer addCargo(CargoDto cargoDto);
+    Customer addCargo(CargoDto cargoDto, Long id);
 
     List<Customer> getAll();
 

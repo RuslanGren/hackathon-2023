@@ -34,5 +34,6 @@ public class Cargo {
 
     @ManyToOne
     @JoinColumn(name = "carrier_id")
+    @JsonBackReference
     private Carrier carrier;
 }

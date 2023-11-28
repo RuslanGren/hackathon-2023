@@ -17,8 +17,5 @@ public class CarDto {
     @Min(value = 0, message = "Обєм не може бути менше нуля")
     @Max(value = 1_000_000, message = "Помилка максимального обєму")
     private double volume;
-
     private String insurance;
-
-    private Long carrierId;
 }

@@ -8,4 +8,6 @@ public interface CargoService {
     Cargo createCargo(CargoDto cargoDto, Customer customer);
 
     void saveCargo(Cargo cargo);
+
+    Cargo getCargoById(Long id);
 }

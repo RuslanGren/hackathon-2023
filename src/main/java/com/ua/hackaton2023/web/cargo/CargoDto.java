@@ -33,6 +33,4 @@ public class CargoDto {
     private String endAddress;
 
     private String insurance;
-
-    private Long customerId;
 }
