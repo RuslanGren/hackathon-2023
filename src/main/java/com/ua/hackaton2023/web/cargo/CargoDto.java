@@ -32,5 +32,7 @@ public class CargoDto {
     @Size(max = 256, message = "Кінцева адресса занадто довга")
     private String endAddress;
 
+    private String insurance;
+
     private Long customerId;
 }

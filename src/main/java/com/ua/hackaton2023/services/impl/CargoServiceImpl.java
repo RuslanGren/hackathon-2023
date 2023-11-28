@@ -22,6 +22,7 @@ public class CargoServiceImpl implements CargoService {
                 .volume(cargoDto.getVolume())
                 .startAddress(cargoDto.getStartAddress())
                 .endAddress(cargoDto.getEndAddress())
+                .insurance(cargoDto.getInsurance())
                 .customer(customer)
                 .isActive(true)
                 .build();
