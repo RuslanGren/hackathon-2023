@@ -44,4 +44,17 @@ public class CarrierServiceImpl implements CarrierService {
     public Carrier getCarrierById(Long id) {
         return carrierRepository.findById(id).orElseThrow(CarrierNotFoundException::new);
     }
+
+    @Override
+    public Carrier addCars(List<CarDto> carDtos) {
+        Carrier carrier = getCarrierById(carDtos.get(0).getCarrierId());
+
+        List<Car> carList = carService.createCars(carDtos, carrier);
+        carService.saveCars(carList);
+
+        List<Car> cars = carrier.getCars();
+        cars.addAll(carList);
+        carrier.setCars(cars);
+        return carrierRepository.save(carrier);
+    }
 }

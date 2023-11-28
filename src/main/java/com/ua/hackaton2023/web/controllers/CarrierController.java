@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/carrier")
@@ -23,5 +25,10 @@ public class CarrierController {
     @PostMapping("/add/car")
     public ResponseEntity<Carrier> addCar(@Valid @RequestBody CarDto carDto) {
         return new ResponseEntity<>(carrierService.addCar(carDto), HttpStatus.OK);
+    }
+
+    @PostMapping("/add/cars")
+    public ResponseEntity<Carrier> addCars(@Valid @RequestBody List<CarDto> carDtos) {
+        return new ResponseEntity<>(carrierService.addCars(carDtos), HttpStatus.OK);
     }
 }

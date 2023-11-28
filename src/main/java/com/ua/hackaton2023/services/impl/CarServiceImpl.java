@@ -8,6 +8,8 @@ import com.ua.hackaton2023.web.carrier.CarDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class CarServiceImpl implements CarService {
@@ -32,5 +34,18 @@ public class CarServiceImpl implements CarService {
         carRepository.save(car);
     }
 
+    @Override
+    public List<Car> createCars(List<CarDto> carDtos, Carrier carrier) {
+        return carDtos.stream()
+                .map(carDto -> createCar(carDto, carrier))
+                .toList();
+    }
 
+    @Override
+    public void saveCars(List<Car> cars) {
+        if (cars == null) {
+            throw new NullPointerException();
+        }
+        carRepository.saveAll(cars);
+    }
 }
