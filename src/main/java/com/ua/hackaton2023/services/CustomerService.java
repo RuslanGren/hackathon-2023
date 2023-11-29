@@ -10,7 +10,7 @@ public interface CustomerService {
 
     Customer addCargo(CargoDto cargoDto, UserDetails userDetails);
 
-    Customer addCustomer(User user);
+    Customer addCustomer(User user, String name);
 
     void deleteCargo(Long cargoId, UserDetails userDetails);
 }

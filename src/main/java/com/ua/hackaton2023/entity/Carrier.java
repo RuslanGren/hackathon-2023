@@ -26,15 +26,15 @@ public class Carrier {
     private List<Car> cars;
 
     @OneToMany(mappedBy = "carrier")
-    @JsonManagedReference
-    private List<Cargo> cargosList;
+    private List<CarrierResponse> responses;
 
     @OneToOne
     @JoinColumn(name = "user_id")
     @JsonIgnore
     private User user;
 
-    public Carrier(User user) {
+    public Carrier(String name, User user) {
+        this.name = name;
         this.user = user;
     }
 }

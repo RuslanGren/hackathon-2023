@@ -24,7 +24,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public User register(UserDto userDto) {
-        if (userRepository.findByUsername(userDto.getUsername()).isPresent()) {
+        if (userRepository.findByUsername(userDto.getEmail()).isPresent()) {
             throw new UserAlreadyExistsException();
         }
         if (!userDto.getPassword().equals(userDto.getRepeatedPassword())) {
@@ -32,16 +32,16 @@ public class AuthServiceImpl implements AuthService {
         }
         String role = userDto.getRole();
         User user = new User(
-                userDto.getUsername(),
+                userDto.getEmail(),
                 passwordEncoder.encode(userDto.getPassword()),
                 Role.valueOf(role)
         );
         userRepository.save(user);
 
         if (role.equals("CUSTOMER")) {
-            customerService.addCustomer(user);
+            customerService.addCustomer(user, userDto.getName());
         } else if (role.equals("CARRIER")){
-            carrierService.addCarrier(user);
+            carrierService.addCarrier(user, userDto.getName());
         } else {
             throw new NotRoleExists();
         }

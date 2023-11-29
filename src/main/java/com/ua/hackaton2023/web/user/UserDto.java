@@ -7,10 +7,14 @@ import lombok.Data;
 
 @Data
 public class UserDto {
-    @NotBlank(message = "Імя не повинно бути пустим")
+    @NotBlank(message = "Повна назва не повинна бути пустою")
+    @Size(max = 64, message = "Розмір повної назви занадто великий!")
+    private String name;
+
+    @NotBlank(message = "Пошта не повинна бути пустою")
     @Size(max = 64, message = "Розмір пошти занадто великий!")
     @Email
-    private String username;
+    private String email;
 
     @NotBlank(message = "Пароль не повинний бути пустим")
     @Size(min = 4, max = 64, message = "Розмір пароля повинний бути між 4 і 64 символами")

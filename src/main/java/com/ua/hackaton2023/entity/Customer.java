@@ -30,7 +30,8 @@ public class Customer {
     @JsonIgnore
     private User user;
 
-    public Customer(User user) {
+    public Customer(String name, User user) {
+        this.name = name;
         this.user = user;
     }
 }

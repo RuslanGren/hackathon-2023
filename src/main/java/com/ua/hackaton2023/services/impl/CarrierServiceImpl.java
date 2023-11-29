@@ -1,14 +1,13 @@
 package com.ua.hackaton2023.services.impl;
 
-import com.ua.hackaton2023.entity.Car;
-import com.ua.hackaton2023.entity.Cargo;
-import com.ua.hackaton2023.entity.Carrier;
-import com.ua.hackaton2023.entity.User;
+import com.ua.hackaton2023.entity.*;
+import com.ua.hackaton2023.exceptions.cargo.CargoIsNotActiveException;
 import com.ua.hackaton2023.repository.CarrierRepository;
 import com.ua.hackaton2023.services.CarService;
 import com.ua.hackaton2023.services.CargoService;
 import com.ua.hackaton2023.services.CarrierService;
 import com.ua.hackaton2023.web.carrier.CarDto;
+import com.ua.hackaton2023.web.carrier.CarrierResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -23,11 +22,11 @@ public class CarrierServiceImpl implements CarrierService {
     private final CargoService cargoService;
 
     @Override
-    public Carrier addCarrier(User user) {
+    public Carrier addCarrier(User user, String name) {
         if (user == null) {
             throw new NullPointerException();
         }
-        return carrierRepository.save(new Carrier(user));
+        return carrierRepository.save(new Carrier(name, user));
     }
 
     @Override
@@ -62,16 +61,27 @@ public class CarrierServiceImpl implements CarrierService {
     }
 
     @Override
-    public Carrier pickCargo(Long cargoId, UserDetails userDetails) {
-        Carrier carrier = getCarrierByUserDetails(userDetails);
-
+    public Carrier responseCargo(Long cargoId, CarrierResponseDto carrierResponseDto, UserDetails userDetails) {
         Cargo cargo = cargoService.getCargoById(cargoId);
-        cargo.setCarrier(carrier);
+        if (!cargo.isActive()) {
+            throw new CargoIsNotActiveException();
+        }
+
+        Carrier carrier = getCarrierByUserDetails(userDetails);
+        CarrierResponse carrierResponse = CarrierResponse.builder()
+                .description(carrierResponseDto.getDescription())
+                .cost(carrierResponseDto.getCost())
+                .carrier(carrier)
+                .build();
+
+        List<CarrierResponse> responses = cargo.getResponses();
+        responses.add(carrierResponse);
+        cargo.setResponses(responses);
         cargoService.saveCargo(cargo);
 
-        List<Cargo> cargos = carrier.getCargosList();
-        cargos.add(cargo);
-        carrier.setCargosList(cargos);
+        List<CarrierResponse> carrierResponses = carrier.getResponses();
+        carrierResponses.add(carrierResponse);
+        carrier.setResponses(carrierResponses);
         return carrierRepository.save(carrier);
     }
 

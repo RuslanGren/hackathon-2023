@@ -39,11 +39,11 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public Customer addCustomer(User user) {
+    public Customer addCustomer(User user, String name) {
         if (user == null) {
             throw new NullPointerException();
         }
-        return customerRepository.save(new Customer(user));
+        return customerRepository.save(new Customer(name, user));
     }
 
     @Override

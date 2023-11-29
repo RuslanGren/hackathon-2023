@@ -5,9 +5,9 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
-@Getter
-@Setter
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -28,7 +28,11 @@ public class Cargo {
     private String endAddress;
     @Column(name = "is_active")
     private boolean isActive;
+    private boolean isFinished;
     private LocalDate date;
+
+    @OneToMany(mappedBy = "cargo")
+    private List<CarrierResponse> responses;
 
     @ManyToOne
     @JoinColumn(name = "customer_id")

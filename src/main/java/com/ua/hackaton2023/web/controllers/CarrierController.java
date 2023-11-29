@@ -3,6 +3,7 @@ package com.ua.hackaton2023.web.controllers;
 import com.ua.hackaton2023.entity.Carrier;
 import com.ua.hackaton2023.services.CarrierService;
 import com.ua.hackaton2023.web.carrier.CarDto;
+import com.ua.hackaton2023.web.carrier.CarrierResponseDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,12 +20,13 @@ import java.util.List;
 public class CarrierController {
     private final CarrierService carrierService;
 
-    @PatchMapping("/cargo/pick")
-    public ResponseEntity<Carrier> pickCargo(
+    @PatchMapping("/cargo/response")
+    public ResponseEntity<Carrier> responseCargo(
             @RequestParam("cargoId") Long cargoId,
+            @RequestBody CarrierResponseDto carrierResponseDto,
             @AuthenticationPrincipal UserDetails userDetails
     ) {
-        return new ResponseEntity<>(carrierService.pickCargo(cargoId, userDetails), HttpStatus.OK);
+        return new ResponseEntity<>(carrierService.responseCargo(cargoId, carrierResponseDto, userDetails), HttpStatus.OK);
     }
 
     @PostMapping("/add/car")
