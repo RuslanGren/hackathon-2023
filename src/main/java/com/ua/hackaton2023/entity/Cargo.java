@@ -1,6 +1,7 @@
 package com.ua.hackaton2023.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -32,6 +33,7 @@ public class Cargo {
     private LocalDate date;
 
     @OneToMany(mappedBy = "cargo")
+    @JsonManagedReference
     private List<CarrierResponse> responses;
 
     @ManyToOne

@@ -1,5 +1,6 @@
 package com.ua.hackaton2023.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,10 +21,12 @@ public class CarrierResponse {
     private double cost;
 
     @ManyToOne
+    @JsonBackReference
     @JoinColumn(name = "cargo_id")
     private Cargo cargo;
 
     @ManyToOne
+    @JsonBackReference
     @JoinColumn(name = "carrier_id")
     private Carrier carrier;
 }

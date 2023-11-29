@@ -3,6 +3,7 @@ package com.ua.hackaton2023.services.impl;
 import com.ua.hackaton2023.entity.*;
 import com.ua.hackaton2023.exceptions.cargo.CargoIsNotActiveException;
 import com.ua.hackaton2023.repository.CarrierRepository;
+import com.ua.hackaton2023.repository.CarrierResponseRepository;
 import com.ua.hackaton2023.services.CarService;
 import com.ua.hackaton2023.services.CargoService;
 import com.ua.hackaton2023.services.CarrierService;
@@ -20,6 +21,7 @@ public class CarrierServiceImpl implements CarrierService {
     private final CarrierRepository carrierRepository;
     private final CarService carService;
     private final CargoService cargoService;
+    private final CarrierResponseRepository carrierResponseRepository;
 
     @Override
     public Carrier addCarrier(User user, String name) {
@@ -66,13 +68,15 @@ public class CarrierServiceImpl implements CarrierService {
         if (!cargo.isActive()) {
             throw new CargoIsNotActiveException();
         }
-
         Carrier carrier = getCarrierByUserDetails(userDetails);
+
         CarrierResponse carrierResponse = CarrierResponse.builder()
                 .description(carrierResponseDto.getDescription())
                 .cost(carrierResponseDto.getCost())
                 .carrier(carrier)
+                .cargo(cargo)
                 .build();
+        carrierResponseRepository.save(carrierResponse);
 
         List<CarrierResponse> responses = cargo.getResponses();
         responses.add(carrierResponse);
