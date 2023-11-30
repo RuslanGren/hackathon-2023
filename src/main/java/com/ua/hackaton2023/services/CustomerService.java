@@ -16,4 +16,6 @@ public interface CustomerService {
     void deleteCargo(Long cargoId, UserDetails userDetails);
 
     Cargo chooseCargoCarrier(Long cargoId, Long carrierResponseId, UserDetails userDetails);
+
+    Cargo finishCargo(Long cargoId, int stars, UserDetails userDetails);
 }

@@ -38,10 +38,19 @@ public class CustomerController {
     @PatchMapping("/cargo/choose")
     public ResponseEntity<Cargo> chooseCargoCarrier(
             @RequestParam("cargoId") Long cargoId,
-            @RequestParam("carrierId") Long carrierResponseId,
+            @RequestParam("carrierResponseId") Long carrierResponseId,
             @AuthenticationPrincipal UserDetails userDetails
     ) {
         return new ResponseEntity<>(customerService.chooseCargoCarrier(cargoId, carrierResponseId, userDetails),
                 HttpStatus.OK);
+    }
+
+    @PatchMapping("/cargo/finish")
+    public ResponseEntity<Cargo> finishCargo(
+            @RequestParam("cargoId") Long cargoId,
+            @RequestParam("stars") int stars,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        return new ResponseEntity<>(customerService.finishCargo(cargoId, stars, userDetails), HttpStatus.OK);
     }
 }

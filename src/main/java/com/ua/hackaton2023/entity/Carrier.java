@@ -23,6 +23,10 @@ public class Carrier {
     private String description;
     private String address;
 
+    private int totalRatings = 0;
+    private int totalScore = 0;
+    private double averageScore;
+
     @OneToMany(mappedBy = "carrier")
     @JsonManagedReference
     private List<Car> cars;

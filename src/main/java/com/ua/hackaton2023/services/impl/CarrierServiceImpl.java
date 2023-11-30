@@ -56,6 +56,17 @@ public class CarrierServiceImpl implements CarrierService {
     }
 
     @Override
+    public void setScore(Carrier carrier, int stars) {
+        int totalRatings = carrier.getTotalRatings() + 1;
+        int totalScore = carrier.getTotalScore() + stars;
+        double averageScore = (double) totalScore / totalRatings;
+        carrier.setTotalRatings(totalRatings);
+        carrier.setTotalScore(totalScore);
+        carrier.setAverageScore(averageScore);
+        carrierRepository.save(carrier);
+    }
+
+    @Override
     public Carrier addCars(List<CarDto> carDtos, UserDetails userDetails) {
         Carrier carrier = getCarrierByUserDetails(userDetails);
 

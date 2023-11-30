@@ -22,4 +22,6 @@ public interface CarrierService {
     Carrier getCarrierByUserDetails(UserDetails userDetails);
 
     Carrier getCarrierById(Long id);
+
+    void setScore(Carrier carrier, int stars);
 }
