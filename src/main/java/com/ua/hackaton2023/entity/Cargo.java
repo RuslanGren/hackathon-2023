@@ -40,9 +40,4 @@ public class Cargo {
     @JoinColumn(name = "customer_id")
     @JsonBackReference
     private Customer customer;
-
-    @ManyToOne
-    @JoinColumn(name = "carrier_id")
-    @JsonBackReference
-    private Carrier carrier;
 }

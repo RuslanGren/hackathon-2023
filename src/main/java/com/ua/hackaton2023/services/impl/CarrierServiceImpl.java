@@ -2,6 +2,7 @@ package com.ua.hackaton2023.services.impl;
 
 import com.ua.hackaton2023.entity.*;
 import com.ua.hackaton2023.exceptions.cargo.CargoIsNotActiveException;
+import com.ua.hackaton2023.exceptions.carrier.CarrierNotFoundException;
 import com.ua.hackaton2023.repository.CarrierRepository;
 import com.ua.hackaton2023.repository.CarrierResponseRepository;
 import com.ua.hackaton2023.services.CarService;
@@ -50,6 +51,11 @@ public class CarrierServiceImpl implements CarrierService {
     }
 
     @Override
+    public Carrier getCarrierById(Long id) {
+        return carrierRepository.findById(id).orElseThrow(CarrierNotFoundException::new);
+    }
+
+    @Override
     public Carrier addCars(List<CarDto> carDtos, UserDetails userDetails) {
         Carrier carrier = getCarrierByUserDetails(userDetails);
 
@@ -75,6 +81,7 @@ public class CarrierServiceImpl implements CarrierService {
                 .cost(carrierResponseDto.getCost())
                 .carrier(carrier)
                 .cargo(cargo)
+                .isApplied(false)
                 .build();
         carrierResponseRepository.save(carrierResponse);
 

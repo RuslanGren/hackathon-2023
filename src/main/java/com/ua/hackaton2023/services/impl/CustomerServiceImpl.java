@@ -1,9 +1,11 @@
 package com.ua.hackaton2023.services.impl;
 
-import com.ua.hackaton2023.entity.Cargo;
-import com.ua.hackaton2023.entity.Customer;
-import com.ua.hackaton2023.entity.User;
+import com.ua.hackaton2023.entity.*;
+import com.ua.hackaton2023.exceptions.cargo.CargoAccessDeniedException;
+import com.ua.hackaton2023.exceptions.carrier.CarrierNotFoundException;
+import com.ua.hackaton2023.exceptions.carrier.CarrierResponseNotFoundException;
 import com.ua.hackaton2023.exceptions.customer.CustomerCargoAccessDeniedException;
+import com.ua.hackaton2023.repository.CarrierResponseRepository;
 import com.ua.hackaton2023.repository.CustomerRepository;
 import com.ua.hackaton2023.services.CargoService;
 import com.ua.hackaton2023.services.CustomerService;
@@ -19,6 +21,7 @@ import java.util.List;
 public class CustomerServiceImpl implements CustomerService {
     private final CustomerRepository customerRepository;
     private final CargoService cargoService;
+    private final CarrierResponseRepository carrierResponseRepository;
 
     @Override
     public Customer getCustomerByUserDetails(UserDetails userDetails) {
@@ -59,4 +62,25 @@ public class CustomerServiceImpl implements CustomerService {
         customerRepository.save(customer);
         cargoService.removeCargo(cargo);
     }
+
+    @Override
+    public Cargo chooseCargoCarrier(Long cargoId, Long carrierResponseId, UserDetails userDetails) {
+        Customer customer = getCustomerByUserDetails(userDetails);
+        Cargo cargo = cargoService.getCargoById(cargoId);
+        if (!cargo.getCustomer().equals(customer)) {
+            throw new CargoAccessDeniedException();
+        }
+
+        CarrierResponse carrierResponse = carrierResponseRepository.findById(carrierResponseId)
+                .orElseThrow(CarrierResponseNotFoundException::new);
+        if (!cargo.getResponses().contains(carrierResponse)) {
+            throw new CarrierNotFoundException();
+        }
+        carrierResponse.setApplied(true);
+        carrierResponseRepository.save(carrierResponse); // save carrier response in db
+
+        cargo.setActive(false);
+        return cargoService.saveCargo(cargo); // save cargo in db
+    }
+
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.List;
 @Data
 @Entity
 @NoArgsConstructor
+@EqualsAndHashCode(of = "id")
 @Table(name = "carriers")
 public class Carrier {
     @Id

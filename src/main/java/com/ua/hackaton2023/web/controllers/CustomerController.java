@@ -1,5 +1,6 @@
 package com.ua.hackaton2023.web.controllers;
 
+import com.ua.hackaton2023.entity.Cargo;
 import com.ua.hackaton2023.entity.Customer;
 import com.ua.hackaton2023.services.CustomerService;
 import com.ua.hackaton2023.web.cargo.CargoDto;
@@ -32,5 +33,15 @@ public class CustomerController {
     ) {
         customerService.deleteCargo(cargoId, userDetails);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PatchMapping("/cargo/choose")
+    public ResponseEntity<Cargo> chooseCargoCarrier(
+            @RequestParam("cargoId") Long cargoId,
+            @RequestParam("carrierId") Long carrierResponseId,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        return new ResponseEntity<>(customerService.chooseCargoCarrier(cargoId, carrierResponseId, userDetails),
+                HttpStatus.OK);
     }
 }

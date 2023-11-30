@@ -1,6 +1,8 @@
 package com.ua.hackaton2023.services.impl;
 
 import com.ua.hackaton2023.entity.Cargo;
+import com.ua.hackaton2023.entity.Carrier;
+import com.ua.hackaton2023.entity.CarrierResponse;
 import com.ua.hackaton2023.entity.Customer;
 import com.ua.hackaton2023.exceptions.cargo.CargoNotFoundException;
 import com.ua.hackaton2023.repository.CargoRepository;
@@ -33,11 +35,11 @@ public class CargoServiceImpl implements CargoService {
     }
 
     @Override
-    public void saveCargo(Cargo cargo) {
+    public Cargo saveCargo(Cargo cargo) {
         if (cargo == null) {
             throw new NullPointerException();
         }
-        cargoRepository.save(cargo);
+        return cargoRepository.save(cargo);
     }
 
     @Override

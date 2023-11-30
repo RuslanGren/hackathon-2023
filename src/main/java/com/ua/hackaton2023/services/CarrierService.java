@@ -20,4 +20,6 @@ public interface CarrierService {
     void deleteCar(Long carId, UserDetails userDetails);
 
     Carrier getCarrierByUserDetails(UserDetails userDetails);
+
+    Carrier getCarrierById(Long id);
 }

@@ -2,15 +2,13 @@ package com.ua.hackaton2023.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(of = "id")
 @Builder
 @Table(name = "responses")
 public class CarrierResponse {
@@ -19,6 +17,7 @@ public class CarrierResponse {
     private Long id;
     private String description;
     private double cost;
+    private boolean isApplied;
 
     @ManyToOne
     @JsonBackReference
