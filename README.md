@@ -1,7 +1,8 @@
 # Hackathon-2023
 
 ### Available features without authentication:
-1) Registration (POST /api/auth/register)
+1) Get auth token (GET /api/auth)
+2) Registration (POST /api/auth/registration)
 
 ### There are two types of users:
 1) Customer
@@ -20,4 +21,4 @@
 4) Response to cargo (PATCH /api/carrier/cargo/response) request param cargoId and request body of carrierResponseDto
 
 The data is stored in a PostgreSQL database.
-Password is stored as Hash
+Using JWT.
