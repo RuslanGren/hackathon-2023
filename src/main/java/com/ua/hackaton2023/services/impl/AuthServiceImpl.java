@@ -1,50 +1,52 @@
 package com.ua.hackaton2023.services.impl;
 
-import com.ua.hackaton2023.entity.Role;
 import com.ua.hackaton2023.entity.User;
-import com.ua.hackaton2023.exceptions.user.NotRoleExists;
-import com.ua.hackaton2023.exceptions.user.PasswordBadRequestException;
-import com.ua.hackaton2023.exceptions.user.UserAlreadyExistsException;
-import com.ua.hackaton2023.repository.UserRepository;
+import com.ua.hackaton2023.exceptions.BadRequestException;
+import com.ua.hackaton2023.exceptions.UnauthorizedException;
 import com.ua.hackaton2023.services.AuthService;
-import com.ua.hackaton2023.services.CarrierService;
-import com.ua.hackaton2023.services.CustomerService;
+import com.ua.hackaton2023.util.JwtTokenUtils;
+import com.ua.hackaton2023.web.user.JwtRequest;
+import com.ua.hackaton2023.web.user.JwtResponse;
+import com.ua.hackaton2023.web.user.RegistrationUserDto;
 import com.ua.hackaton2023.web.user.UserDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final CustomerService customerService;
-    private final CarrierService carrierService;
+    private final UserServiceImpl userService;
+    private final AuthenticationManager authenticationManager;
+    private final JwtTokenUtils jwtTokenUtils;
 
     @Override
-    public User register(UserDto userDto) {
-        if (userRepository.findByUsername(userDto.getEmail()).isPresent()) {
-            throw new UserAlreadyExistsException();
+    public JwtResponse createAuthToken(JwtRequest authRequest) {
+        try {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getEmail(),
+                    authRequest.getPassword()));
+        } catch (BadCredentialsException e) {
+            throw new UnauthorizedException("Email or password is wrong");
         }
-        if (!userDto.getPassword().equals(userDto.getRepeatedPassword())) {
-            throw new PasswordBadRequestException();
-        }
-        String role = userDto.getRole();
-        User user = new User(
-                userDto.getEmail(),
-                passwordEncoder.encode(userDto.getPassword()),
-                Role.valueOf(role)
-        );
-        userRepository.save(user);
+        UserDetails userDetails = userService.loadUserByUsername(authRequest.getEmail());
+        String token = jwtTokenUtils.createToken(userDetails);
 
-        if (role.equals("CUSTOMER")) {
-            customerService.addCustomer(user, userDto.getName());
-        } else if (role.equals("CARRIER")){
-            carrierService.addCarrier(user, userDto.getName());
-        } else {
-            throw new NotRoleExists();
+        return new JwtResponse(token);
+    }
+
+    public UserDto createNewUser(RegistrationUserDto registrationUserDto) {
+        if (!registrationUserDto.getPassword().equals(registrationUserDto.getConfirmPassword())) {
+            throw new BadRequestException("Passwords don't match");
         }
-        return user;
+
+        if (userService.findByEmail(registrationUserDto.getEmail()).isPresent()) {
+            throw new BadRequestException("User already exists");
+        }
+
+        User user = userService.createNewUser(registrationUserDto);
+        return new UserDto(user.getId(), user.getUsername(), user.getEmail());
     }
 }
