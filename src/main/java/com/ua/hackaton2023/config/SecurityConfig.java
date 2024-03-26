@@ -45,8 +45,6 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/webjars/**",
                                 "/swagger-ui.html").permitAll()
-                        .requestMatchers("/api/auth/ns").permitAll()
-                        .requestMatchers("/api/auth/s").authenticated()
                         .requestMatchers("/api/customer/**").hasAnyRole("CUSTOMER")
                         .requestMatchers("/api/carrier/**").hasAnyRole("CARRIER")
                         .anyRequest().permitAll())

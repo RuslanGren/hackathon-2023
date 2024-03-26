@@ -26,14 +26,4 @@ public class AuthController {
     public ResponseEntity<UserDto> registration(@Valid @RequestBody RegistrationUserDto registrationUserDto) {
         return new ResponseEntity<>(authService.createNewUser(registrationUserDto), HttpStatus.OK);
     }
-
-    @GetMapping("/ns")
-    public ResponseEntity<String> testNot() {
-        return new ResponseEntity<>("everything is ok NOT SECURED", HttpStatus.OK);
-    }
-
-    @GetMapping("/s")
-    public ResponseEntity<String> test() {
-        return new ResponseEntity<>("everything is ok SECURED", HttpStatus.OK);
-    }
 }
