@@ -1,7 +1,7 @@
 # Hackathon-2023
 
 ### Available features without authentication:
-1) Get auth token (GET /api/auth)
+1) Get auth token (POST /api/auth)
 2) Registration (POST /api/auth/registration)
 
 ### There are two types of users:
