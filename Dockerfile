@@ -1,10 +1,11 @@
-FROM maven:3.8.4-openjdk-17 as builder
+FROM maven:3.8.4-openjdk-17 AS build
 WORKDIR /app
-COPY . /app/.
-RUN mvn -f /app/pom.xml clean package -Dmaven.test.skip=true
+COPY pom.xml .
+COPY src ./src
+RUN mvn clean install
 
-FROM eclipse-temurin:17-jre-alpine
+FROM openjdk:17-alpine
 WORKDIR /app
-COPY --from=builder /app/target/*.jar /app/*.jar
+COPY --from=build /app/target/ctsoua-0.0.1-SNAPSHOT.jar ./ctsoua.jar
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "/app/*.jar"]
+CMD ["java", "-jar", "ctsoua.jar"]
