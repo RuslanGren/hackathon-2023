@@ -20,7 +20,7 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
     private TelegramServiceImpl telegramService;
 
     public TelegramBotUtils() {
-        super("BOT_TOKEN");
+        super("6959322213:AAGjboBmXBH3PixnTip8bT6ISYRfIiI_c7E");
     }
 
     @Override
@@ -41,13 +41,25 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
         SendMessage message = new SendMessage();
         message.setChatId(chatId);
         message.enableHtml(true);
-        message.setText("<b>Вітаю!</b> Спочатку увійдіть у свій профіль: <a href='http://localhost:8080/login'>увійти</a>");
+        message.setText(String.format("<b>Вітаю!</b> Спочатку увійдіть у свій профіль: http://localhost:8080/login?chatId=%d", chatId));
 
         try {
             execute(message);
         } catch (TelegramApiException e) {
             System.out.println(e.getMessage());
         }
+        ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+        keyboardMarkup.setSelective(true);
+        keyboardMarkup.setResizeKeyboard(true);
+        List<KeyboardRow> rows = new ArrayList<>();
+        KeyboardRow row = new KeyboardRow();
+        row.add("Перевірити");
+        rows.add(row);
+        keyboardMarkup.setKeyboard(rows);
+        message.setReplyMarkup(keyboardMarkup);
+
+
+
     }
 
     private void sendMainMenu(Long chatId) {
