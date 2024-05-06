@@ -2,7 +2,6 @@ package com.ua.hackaton2023.web.controllers;
 
 import com.ua.hackaton2023.services.AuthService;
 import com.ua.hackaton2023.web.user.JwtRequest;
-import com.ua.hackaton2023.web.user.JwtResponse;
 import com.ua.hackaton2023.web.user.RegistrationUserDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -38,13 +37,7 @@ public class TemplateController {
         JwtRequest request = new JwtRequest();
         request.setEmail(username);
         request.setPassword(password);
-        JwtResponse response = authService.createAuthToken(request, chatId);
-        System.out.println(response.getToken());
-        return "successful";
-    }
-
-    @GetMapping("/successful")
-    public String displaySuccessfulPage() {
+        authService.createAuthToken(request, chatId);
         return "successful";
     }
 
@@ -65,11 +58,7 @@ public class TemplateController {
         }
 
         try {
-            System.out.println(userDto.getEmail());
-            System.out.println(userDto.getUsername());
-            System.out.println(userDto.getPassword());
-            System.out.println(userDto.getConfirmPassword());
-            System.out.println(userDto.getRole());
+            authService.createNewUser(userDto);
             return "login";
         } catch (Exception e) {
             model.addAttribute("error", e.getMessage());
