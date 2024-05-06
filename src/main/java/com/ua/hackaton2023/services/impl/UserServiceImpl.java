@@ -73,6 +73,11 @@ public class UserServiceImpl implements UserDetailsService, UserService {
     }
 
     @Override
+    public Optional<User> findByChatId(Long chatId) {
+        return userRepository.findByChatId(chatId);
+    }
+
+    @Override
     public User createNewUser(RegistrationUserDto registrationUserDto) {
         User user = new User();
         user.setUsername(registrationUserDto.getUsername());
@@ -91,5 +96,12 @@ public class UserServiceImpl implements UserDetailsService, UserService {
         }
 
         return user;
+    }
+
+    @Override
+    public void addChatId(String email, Long chatId) {
+        User user = findByEmail(email).get();
+        user.setChatId(chatId);
+        userRepository.save(user);
     }
 }

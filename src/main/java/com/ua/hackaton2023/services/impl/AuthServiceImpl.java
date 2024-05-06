@@ -16,6 +16,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
@@ -24,19 +26,23 @@ public class AuthServiceImpl implements AuthService {
     private final JwtTokenUtils jwtTokenUtils;
 
     @Override
-    public JwtResponse createAuthToken(JwtRequest authRequest) {
+    public JwtResponse createAuthToken(JwtRequest authRequest, Optional<Long> chatId) {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getEmail(),
                     authRequest.getPassword()));
         } catch (BadCredentialsException e) {
             throw new UnauthorizedException("Email or password is wrong");
         }
+
+        chatId.ifPresent(id -> userService.addChatId(authRequest.getEmail(), id)); // if user login via telegram
+
         UserDetails userDetails = userService.loadUserByUsername(authRequest.getEmail());
         String token = jwtTokenUtils.createToken(userDetails);
 
         return new JwtResponse(token);
     }
 
+    @Override
     public UserDto createNewUser(RegistrationUserDto registrationUserDto) {
         if (!registrationUserDto.getPassword().equals(registrationUserDto.getConfirmPassword())) {
             throw new BadRequestException("Passwords don't match");

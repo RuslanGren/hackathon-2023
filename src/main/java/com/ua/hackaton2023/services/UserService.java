@@ -9,4 +9,8 @@ public interface UserService {
     Optional<User> findByEmail(String email);
 
     User createNewUser(RegistrationUserDto registrationUserDto);
+
+    void addChatId(String email, Long chatId);
+
+    Optional<User> findByChatId(Long chatId);
 }

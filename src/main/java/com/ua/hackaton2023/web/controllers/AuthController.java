@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/auth")
@@ -18,8 +20,11 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping
-    public ResponseEntity<JwtResponse> createAuthToken(@RequestBody JwtRequest authRequest) {
-        return new ResponseEntity<>(authService.createAuthToken(authRequest), HttpStatus.OK);
+    public ResponseEntity<JwtResponse> createAuthToken(
+            @RequestBody JwtRequest authRequest,
+            @RequestParam(required = false) Optional<Long> chatId
+    ) {
+        return new ResponseEntity<>(authService.createAuthToken(authRequest, chatId), HttpStatus.OK);
     }
 
     @PostMapping("/registration")

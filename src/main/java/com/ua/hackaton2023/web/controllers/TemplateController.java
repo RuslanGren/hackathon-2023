@@ -14,22 +14,31 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.Optional;
+
 @Controller
 @RequiredArgsConstructor
 public class TemplateController {
     private final AuthService authService;
 
     @GetMapping("/login")
-    public String displayLoginPage() {
+    public String displayLoginPage(
+            @RequestParam(required = false) Optional<Long> chatId,
+            Model model) {
+        model.addAttribute("chatId", chatId);
         return "login";
     }
 
     @PostMapping("/login")
-    public String login(@RequestParam String username, @RequestParam String password) {
+    public String login(
+            @RequestParam String username,
+            @RequestParam String password,
+            @RequestParam(required = false) Optional<Long> chatId
+    ) {
         JwtRequest request = new JwtRequest();
         request.setEmail(username);
         request.setPassword(password);
-        JwtResponse response = authService.createAuthToken(request);
+        JwtResponse response = authService.createAuthToken(request, chatId);
         System.out.println(response.getToken());
         return "successful";
     }

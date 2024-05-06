@@ -1,5 +1,7 @@
 package com.ua.hackaton2023.util;
 
+import com.ua.hackaton2023.services.impl.TelegramServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -14,6 +16,9 @@ import java.util.List;
 
 @Component
 public class TelegramBotUtils extends TelegramLongPollingBot {
+    @Autowired
+    private TelegramServiceImpl telegramService;
+
     public TelegramBotUtils() {
         super("BOT_TOKEN");
     }

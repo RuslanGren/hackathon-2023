@@ -5,8 +5,10 @@ import com.ua.hackaton2023.web.user.JwtResponse;
 import com.ua.hackaton2023.web.user.RegistrationUserDto;
 import com.ua.hackaton2023.web.user.UserDto;
 
+import java.util.Optional;
+
 public interface AuthService {
-    JwtResponse createAuthToken(JwtRequest authRequest);
+    JwtResponse createAuthToken(JwtRequest authRequest, Optional<Long> chatId);
 
     UserDto createNewUser(RegistrationUserDto registrationUserDto);
 }
