@@ -1,5 +1,6 @@
 package com.ua.hackaton2023.util;
 
+import com.ua.hackaton2023.entity.Cargo;
 import com.ua.hackaton2023.services.impl.TelegramServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -90,12 +91,16 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
         }
     }
 
-    private void addCargo(Long chatId) {
+    private void addCargo(Long chatId, Update update) {
         try {
-            SendMessage nameMessage = new SendMessage();
-            nameMessage.setChatId(chatId);
-            nameMessage.setText("Введіть назву вантажу:");
-            execute(nameMessage);
+            Cargo cargo = new Cargo();
+
+            if (cargo.getName().isBlank()) {
+                SendMessage nameMessage = new SendMessage();
+                nameMessage.setChatId(chatId);
+                nameMessage.setText("Введіть назву вантажу:");
+                execute(nameMessage);
+            }
 
             SendMessage weightMessage = new SendMessage();
             weightMessage.setChatId(chatId);
