@@ -12,7 +12,7 @@ public class TelegramServiceImpl implements TelegramService {
     private final UserServiceImpl userService;
 
     public User getUserByChatId(Long chatId) {
-       return userService.findByChatId(chatId).orElseThrow(() -> new BadRequestException("Login Error"));
+       return userService.findByChatId(chatId).get();
 
     }
 
