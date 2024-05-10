@@ -9,6 +9,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
@@ -19,6 +20,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TelegramBotUtils extends TelegramLongPollingBot {
     private final TelegramService telegramService;
+
+
 
     @Override
     public String getBotUsername() {
@@ -41,8 +44,7 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
         message.enableHtml(true);
         message.setText(String.format("<b>Вітаю!</b> Спочатку увійдіть у свій профіль: http://localhost:8080/login?chatId=%d", chatId));
 
-
-        ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+       ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
         keyboardMarkup.setSelective(true);
         keyboardMarkup.setResizeKeyboard(true);
         keyboardMarkup.setOneTimeKeyboard(true);
@@ -54,6 +56,11 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
 
         keyboardMarkup.setKeyboard(keyboard);
         message.setReplyMarkup(keyboardMarkup);
+
+
+
+
+
         try {
             execute(message);
         } catch (TelegramApiException e) {
@@ -61,11 +68,18 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
         }
 
     }
-    private void handleAuthorisation(Long chatId, String text){
+    private void handleAuthorisation(Long chatId, String text ){
+
         if ("Перевірити".equals(text)) {
-               User user = telegramService.getUserByChatId(chatId);
-               System.out.println("User get name");
-               sendMessage(chatId, "Ви успішно авторизувались!");
+            try {
+                User user = telegramService.getUserByChatId(chatId);
+                sendMessage(chatId, "Ви успішно авторизувались!");
+
+            } catch (Exception ignored) {
+                sendMessage(chatId,"Cпроба увійти провалена, спробуйте ще раз!" );
+
+            }
+
         }
 
     }
@@ -82,6 +96,9 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
         }
 
     }
+
+
+
 
 
     @Override
