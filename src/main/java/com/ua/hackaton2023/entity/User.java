@@ -26,7 +26,6 @@ public class User {
 
     private String password;
 
-    @Column(name = "chat_id")
     private Long chatId;
 
     @ManyToMany

@@ -11,9 +11,9 @@ import org.springframework.stereotype.Service;
 public class TelegramServiceImpl implements TelegramService {
     private final UserServiceImpl userService;
 
+    @Override
     public User getUserByChatId(Long chatId) {
-       return userService.findByChatId(chatId).get();
-
+       return userService.findByChatId(chatId).orElseThrow(() -> new BadRequestException("Error"));
     }
 
 }
