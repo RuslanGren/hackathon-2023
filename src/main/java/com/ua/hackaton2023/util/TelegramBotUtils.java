@@ -22,7 +22,6 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
     private final TelegramService telegramService;
 
 
-
     @Override
     public String getBotUsername() {
         return "CTSoUA_bot";
@@ -44,7 +43,7 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
         message.enableHtml(true);
         message.setText(String.format("<b>Вітаю!</b> Спочатку увійдіть у свій профіль: http://localhost:8080/login?chatId=%d", chatId));
 
-       ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+        ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
         keyboardMarkup.setSelective(true);
         keyboardMarkup.setResizeKeyboard(true);
         keyboardMarkup.setOneTimeKeyboard(true);
@@ -58,9 +57,6 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
         message.setReplyMarkup(keyboardMarkup);
 
 
-
-
-
         try {
             execute(message);
         } catch (TelegramApiException e) {
@@ -68,15 +64,19 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
         }
 
     }
-    private void handleAuthorisation(Long chatId, String text ){
+
+    private void handleAuthorisation(Long chatId, String text) {
 
         if ("Перевірити".equals(text)) {
             try {
                 User user = telegramService.getUserByChatId(chatId);
                 sendMessage(chatId, "Ви успішно авторизувались!");
+                sendEmptyKeyboard(chatId, "Авторизація успішна!");
+
 
             } catch (Exception ignored) {
-                sendMessage(chatId,"Cпроба увійти провалена, спробуйте ще раз!" );
+                sendMessage(chatId, "Cпроба увійти провалена, спробуйте ще раз!");
+                sendStartMessage(chatId);
 
             }
 
@@ -85,7 +85,7 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
     }
 
 
-    private void sendMessage( Long chatID, String text){
+    private void sendMessage(Long chatID, String text) {
         SendMessage message = new SendMessage();
         message.setChatId(String.valueOf(chatID));
         message.setText(text);
@@ -97,8 +97,22 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
 
     }
 
+    private void sendEmptyKeyboard(Long chatId, String text) {
+        SendMessage message = new SendMessage();
+        message.setChatId(String.valueOf(chatId));
+        message.setText(text);
 
+        // Очищення клавіатури
+        ReplyKeyboardRemove keyboardRemove = new ReplyKeyboardRemove();
+        keyboardRemove.setRemoveKeyboard(true);
+        message.setReplyMarkup(keyboardRemove);
 
+        try {
+            execute(message);
+        } catch (TelegramApiException exception) {
+            exception.printStackTrace();
+        }
+    }
 
 
     @Override
