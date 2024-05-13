@@ -9,6 +9,7 @@ import com.ua.hackaton2023.services.CustomerService;
 import com.ua.hackaton2023.services.RoleService;
 import com.ua.hackaton2023.services.UserService;
 import com.ua.hackaton2023.web.user.RegistrationUserDto;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -73,6 +74,7 @@ public class UserServiceImpl implements UserDetailsService, UserService {
     }
 
     @Override
+    @Transactional
     public Optional<User> findByChatId(Long chatId) {
         return userRepository.findByChatId(chatId);
     }

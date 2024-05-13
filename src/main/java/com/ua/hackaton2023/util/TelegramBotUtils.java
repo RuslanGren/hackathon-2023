@@ -70,10 +70,9 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
         if ("Перевірити".equals(text)) {
             try {
                 User user = telegramService.getUserByChatId(chatId);
+                System.out.println(user.getRoles().stream().findFirst().get().getName());
                 sendMessage(chatId, "Ви успішно авторизувались!");
                 sendEmptyKeyboard(chatId, "Авторизація успішна!");
-
-
             } catch (Exception ignored) {
                 sendMessage(chatId, "Cпроба увійти провалена, спробуйте ще раз!");
                 sendStartMessage(chatId);
