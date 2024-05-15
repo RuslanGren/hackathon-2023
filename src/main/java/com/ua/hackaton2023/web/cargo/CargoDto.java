@@ -4,11 +4,12 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.Builder;
+
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
-@Builder
+@NoArgsConstructor
 public class CargoDto {
     @NotBlank(message = "Імя не повинне бути пустим")
     @Size(max = 256, message = "Імя занадто довге")

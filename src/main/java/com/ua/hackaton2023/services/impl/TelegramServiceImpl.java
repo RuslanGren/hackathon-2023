@@ -4,6 +4,7 @@ import com.ua.hackaton2023.entity.User;
 import com.ua.hackaton2023.exceptions.BadRequestException;
 import com.ua.hackaton2023.services.CustomerService;
 import com.ua.hackaton2023.services.TelegramService;
+import com.ua.hackaton2023.web.cargo.CargoDto;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,6 +25,12 @@ public class TelegramServiceImpl implements TelegramService {
     @Override
     @Transactional
     public UserDetails getUserDetails(User user) {
-        return userService.loadUserByUsername(user.getUsername());
+        return userService.loadUserByUsername(user.getEmail());
+    }
+
+    @Override
+    @Transactional
+    public void addCargo(CargoDto cargo, UserDetails userDetails) {
+        customerService.addCargo(cargo, userDetails);
     }
 }

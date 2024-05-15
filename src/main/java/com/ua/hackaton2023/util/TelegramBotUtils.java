@@ -1,8 +1,8 @@
 package com.ua.hackaton2023.util;
 
-import com.ua.hackaton2023.entity.Cargo;
 import com.ua.hackaton2023.entity.User;
 import com.ua.hackaton2023.services.TelegramService;
+import com.ua.hackaton2023.web.cargo.CargoDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -22,6 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TelegramBotUtils extends TelegramLongPollingBot {
     private final TelegramService telegramService;
+    private ConversationState conversationState = ConversationState.START;
 
     @Override
     public String getBotUsername() {
@@ -197,8 +198,8 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
         FINISH,
         STOP
     }
-    ConversationState conversationState = ConversationState.START;
-    private void addCargo(Long chatId, String text, Update update, Cargo cargo){
+
+    private void addCargo(Long chatId, String text, Update update, CargoDto cargo){
 
         try {
             switch (conversationState) {
@@ -251,10 +252,8 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
         }
     }
     private void addCargo2(Long chatId, String text, Update update){
-        ConversationState conversationState = ConversationState.START;
-        Cargo cargo = new Cargo();
+        CargoDto cargo = new CargoDto();
         addCargo(chatId, text, update, cargo);
-
     }
 
 
