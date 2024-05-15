@@ -24,6 +24,7 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
     private final TelegramService telegramService;
     private ConversationState conversationState = ConversationState.START;
 
+
     @Override
     public String getBotUsername() {
         return "CTSoUA_bot";
@@ -43,23 +44,18 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
             UserDetails userDetails = telegramService.getUserDetails(user);
             if (role.equals("ROLE_CUSTOMER")) {
                 // TODO: customer class/method
-                customerMethod(chatId);
+
                 keyBoardForCustomer(chatId, "Main menu");
+
+                    addCargo2(chatId, update);
+
             } else if (role.equals("ROLE_CARRIER")) {
                 // TODO: carrier class/method
-                carrierMethod(chatId);
                 keyBoardForCarrier(chatId, "Main menu");
             }
         }
     }
 
-    private void customerMethod(Long chatId) {
-        sendMessage(chatId, "i love martin by customer");
-    }
-
-    private void carrierMethod(Long chatId) {
-        sendMessage(chatId, "i love martin by carrier");
-    }
 
     private void sendStartMessage(Long chatId) {
         SendMessage message = new SendMessage();
@@ -148,6 +144,7 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
         KeyboardRow row1 = new KeyboardRow();
         row1.add("Додати вантаж");
         row1.add("Видалити вантаж");
+        row1.add("Усі вантажі");
         keyboard.add(row1);
         KeyboardRow row2 = new KeyboardRow();
         row2.add("Вибрати перевізника");
@@ -199,9 +196,12 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
         STOP
     }
 
-    private void addCargo(Long chatId, String text, Update update, CargoDto cargo){
+    private void addCargo(Long chatId,  Update update, CargoDto cargo){
+
 
         try {
+
+
             switch (conversationState) {
                 case START:
                     conversationState = ConversationState.NAME_RECEIVED;
@@ -251,9 +251,9 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
             System.out.println(e.getMessage());
         }
     }
-    private void addCargo2(Long chatId, String text, Update update){
+    private void addCargo2(Long chatId, Update update){
         CargoDto cargo = new CargoDto();
-        addCargo(chatId, text, update, cargo);
+        addCargo(chatId, update, cargo);
     }
 
 
