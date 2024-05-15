@@ -2,6 +2,7 @@ package com.ua.hackaton2023.web.user;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -28,5 +29,6 @@ public class RegistrationUserDto {
     @Size(min = 4, max = 64, message = "Розмір пароля повинний бути між 4 і 64 символами")
     private String confirmPassword;
 
+    @NotNull
     private String role;
 }

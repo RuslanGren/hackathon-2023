@@ -3,6 +3,7 @@ package com.ua.hackaton2023.util;
 import com.ua.hackaton2023.entity.User;
 import com.ua.hackaton2023.services.TelegramService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -21,7 +22,6 @@ import java.util.List;
 public class TelegramBotUtils extends TelegramLongPollingBot {
     private final TelegramService telegramService;
 
-
     @Override
     public String getBotUsername() {
         return "CTSoUA_bot";
@@ -34,7 +34,27 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
         if ("/start".equals(message.getText())) {
             sendStartMessage(chatId);
         }
-        handleAuthorisation(chatId, message.getText());
+        
+        User user = handleAuthorisation(chatId, message.getText());
+        if (user != null) {
+            String role = user.getRoles().stream().findFirst().get().getName();
+            UserDetails userDetails = telegramService.getUserDetails(user);
+            if (role.equals("ROLE_CUSTOMER")) {
+                // TODO: customer class/method
+                customerMethod(chatId);
+            } else if (role.equals("ROLE_CARRIER")) {
+                // TODO: carrier class/method
+                carrierMethod(chatId);
+            }
+        }
+    }
+
+    private void customerMethod(Long chatId) {
+        sendMessage(chatId, "i love martin by customer");
+    }
+
+    private void carrierMethod(Long chatId) {
+        sendMessage(chatId, "i love martin by carrier");
     }
 
     private void sendStartMessage(Long chatId) {
@@ -65,22 +85,23 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
 
     }
 
-    private void handleAuthorisation(Long chatId, String text) {
+    private User handleAuthorisation(Long chatId, String text) {
 
         if ("Перевірити".equals(text)) {
             try {
                 User user = telegramService.getUserByChatId(chatId);
-                System.out.println(user.getRoles().stream().findFirst().get().getName());
                 sendMessage(chatId, "Ви успішно авторизувались!");
                 sendEmptyKeyboard(chatId, "Авторизація успішна!");
+                return user;
             } catch (Exception ignored) {
                 sendMessage(chatId, "Cпроба увійти провалена, спробуйте ще раз!");
                 sendStartMessage(chatId);
-
+                return null;
             }
 
+        } else {
+            return null;
         }
-
     }
 
 

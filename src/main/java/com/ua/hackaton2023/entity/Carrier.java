@@ -23,8 +23,11 @@ public class Carrier {
     private String description;
     private String address;
 
+    @Column(name = "total_ratings")
     private int totalRatings = 0;
+    @Column(name = "total_score")
     private int totalScore = 0;
+    @Column(name = "average_score")
     private double averageScore;
 
     @OneToMany(mappedBy = "carrier")

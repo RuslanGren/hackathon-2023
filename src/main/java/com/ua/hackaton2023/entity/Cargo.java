@@ -29,6 +29,7 @@ public class Cargo {
     private String endAddress;
     @Column(name = "is_active")
     private boolean isActive;
+    @Column(name = "is_finished")
     private boolean isFinished;
     private LocalDate date;
 

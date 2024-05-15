@@ -3,13 +3,8 @@ package com.ua.hackaton2023.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.Collections;
-
 @Data
 @Entity
 @NoArgsConstructor
@@ -26,6 +21,7 @@ public class User {
 
     private String password;
 
+    @Column(name = "chat_id", unique = true)
     private Long chatId;
 
     @ManyToMany(fetch = FetchType.EAGER)

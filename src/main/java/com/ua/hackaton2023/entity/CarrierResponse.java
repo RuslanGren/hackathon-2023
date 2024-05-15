@@ -17,6 +17,7 @@ public class CarrierResponse {
     private Long id;
     private String description;
     private double cost;
+    @Column(name = "is_applied")
     private boolean isApplied;
 
     @ManyToOne
