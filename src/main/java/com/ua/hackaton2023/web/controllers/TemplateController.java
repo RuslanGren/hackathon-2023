@@ -59,7 +59,7 @@ public class TemplateController {
 
         try {
             authService.createNewUser(userDto);
-            return "login";
+            return "redirect:/login";
         } catch (Exception e) {
             model.addAttribute("error", e.getMessage());
             return "register";

@@ -8,8 +8,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,34 +21,30 @@ public class CarrierController {
     @PatchMapping("/cargo/response")
     public ResponseEntity<Carrier> responseCargo(
             @RequestParam("cargoId") Long cargoId,
-            @RequestBody CarrierResponseDto carrierResponseDto,
-            @AuthenticationPrincipal UserDetails userDetails
+            @RequestBody CarrierResponseDto carrierResponseDto
     ) {
-        return new ResponseEntity<>(carrierService.responseCargo(cargoId, carrierResponseDto, userDetails), HttpStatus.OK);
+        return new ResponseEntity<>(carrierService.responseCargo(cargoId, carrierResponseDto), HttpStatus.OK);
     }
 
     @PostMapping("/add/car")
     public ResponseEntity<Carrier> addCar(
-            @Valid @RequestBody CarDto carDto,
-            @AuthenticationPrincipal UserDetails userDetails
+            @Valid @RequestBody CarDto carDto
     ) {
-        return new ResponseEntity<>(carrierService.addCar(carDto, userDetails), HttpStatus.OK);
+        return new ResponseEntity<>(carrierService.addCar(carDto), HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/car")
     public ResponseEntity<?> deleteCar(
-            @RequestParam("carId") Long carId,
-            @AuthenticationPrincipal UserDetails userDetails
+            @RequestParam("carId") Long carId
     ) {
-        carrierService.deleteCar(carId, userDetails);
+        carrierService.deleteCar(carId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/add/cars")
     public ResponseEntity<Carrier> addCars(
-            @Valid @RequestBody List<CarDto> carDtos,
-            @AuthenticationPrincipal UserDetails userDetails
+            @Valid @RequestBody List<CarDto> carDtos
     ) {
-        return new ResponseEntity<>(carrierService.addCars(carDtos, userDetails), HttpStatus.OK);
+        return new ResponseEntity<>(carrierService.addCars(carDtos), HttpStatus.OK);
     }
 }

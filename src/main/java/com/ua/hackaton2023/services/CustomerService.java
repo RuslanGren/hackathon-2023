@@ -6,16 +6,19 @@ import com.ua.hackaton2023.entity.User;
 import com.ua.hackaton2023.web.cargo.CargoDto;
 import org.springframework.security.core.userdetails.UserDetails;
 
-public interface CustomerService {
-    Customer getCustomerByUserDetails(UserDetails userDetails);
+import java.util.List;
 
-    Customer addCargo(CargoDto cargoDto, UserDetails userDetails);
+public interface CustomerService {
+    Customer getCustomer();
+    Customer addCargo(CargoDto cargoDto);
 
     Customer addCustomer(User user, String name);
 
-    void deleteCargo(Long cargoId, UserDetails userDetails);
+    void deleteCargo(Long cargoId);
 
-    Cargo chooseCargoCarrier(Long cargoId, Long carrierResponseId, UserDetails userDetails);
+    Cargo chooseCargoCarrier(Long cargoId, Long carrierResponseId);
 
-    Cargo finishCargo(Long cargoId, int stars, UserDetails userDetails);
+    Cargo finishCargo(Long cargoId, int stars);
+
+    List<Cargo> getCargosByUser(Long id);
 }

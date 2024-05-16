@@ -11,15 +11,15 @@ import java.util.List;
 public interface CarrierService {
     Carrier addCarrier(User user, String name);
 
-    Carrier addCar(CarDto carDto, UserDetails userDetails);
+    Carrier addCar(CarDto carDto);
 
-    Carrier addCars(List<CarDto> carDtos, UserDetails userDetails);
+    Carrier addCars(List<CarDto> carDtos);
 
-    Carrier responseCargo(Long cargoId, CarrierResponseDto carrierResponseDto, UserDetails userDetails);
+    Carrier responseCargo(Long cargoId, CarrierResponseDto carrierResponseDto);
 
-    void deleteCar(Long carId, UserDetails userDetails);
+    void deleteCar(Long carId);
 
-    Carrier getCarrierByUserDetails(UserDetails userDetails);
+    Carrier getCarrier();
 
     Carrier getCarrierById(Long id);
 

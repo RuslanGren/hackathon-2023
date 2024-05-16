@@ -1,17 +1,21 @@
 package com.ua.hackaton2023.services.impl;
 
+import com.ua.hackaton2023.entity.Carrier;
+import com.ua.hackaton2023.entity.Customer;
 import com.ua.hackaton2023.entity.Role;
 import com.ua.hackaton2023.entity.User;
 import com.ua.hackaton2023.exceptions.BadRequestException;
+import com.ua.hackaton2023.exceptions.user.UserNotFoundException;
+import com.ua.hackaton2023.repository.CarrierRepository;
+import com.ua.hackaton2023.repository.CustomerRepository;
 import com.ua.hackaton2023.repository.UserRepository;
-import com.ua.hackaton2023.services.CarrierService;
-import com.ua.hackaton2023.services.CustomerService;
 import com.ua.hackaton2023.services.RoleService;
 import com.ua.hackaton2023.services.UserService;
 import com.ua.hackaton2023.web.user.RegistrationUserDto;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -25,10 +29,10 @@ import java.util.stream.Collectors;
 @Service
 public class UserServiceImpl implements UserDetailsService, UserService {
     private UserRepository userRepository;
+    private CustomerRepository customerRepository;
+    private CarrierRepository carrierRepository;
     private PasswordEncoder passwordEncoder;
     private RoleService roleService;
-    private CustomerService customerService;
-    private CarrierService carrierService;
 
     @Autowired
     public void setUserRepository(UserRepository userRepository) {
@@ -46,13 +50,13 @@ public class UserServiceImpl implements UserDetailsService, UserService {
     }
 
     @Autowired
-    public void setCustomerService(CustomerService customerService) {
-        this.customerService = customerService;
+    public void setCustomerRepository(CustomerRepository customerRepository) {
+        this.customerRepository = customerRepository;
     }
 
     @Autowired
-    public void setCarrierService(CarrierService carrierService) {
-        this.carrierService = carrierService;
+    public void setCarrierRepository(CarrierRepository carrierRepository) {
+        this.carrierRepository = carrierRepository;
     }
 
 
@@ -66,6 +70,17 @@ public class UserServiceImpl implements UserDetailsService, UserService {
                 user.getPassword(),
                 user.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList())
         );
+    }
+
+    @Override
+    public User getUser() {
+        String email = SecurityContextHolder
+                .getContext()
+                .getAuthentication().getName();
+
+        return userRepository
+                .findByEmail(email)
+                .orElseThrow(UserNotFoundException::new);
     }
 
     @Override
@@ -92,9 +107,9 @@ public class UserServiceImpl implements UserDetailsService, UserService {
         userRepository.save(user);
 
         if (roleName.equals("ROLE_CUSTOMER")) {
-            customerService.addCustomer(user, registrationUserDto.getUsername());
+            customerRepository.save(new Customer(registrationUserDto.getUsername(), user));
         } else if (roleName.equals("ROLE_CARRIER")) {
-            carrierService.addCarrier(user, registrationUserDto.getUsername());
+            carrierRepository.save(new Carrier(registrationUserDto.getUsername(), user));
         }
 
         return user;

@@ -30,7 +30,7 @@ public class TelegramServiceImpl implements TelegramService {
 
     @Override
     @Transactional
-    public void addCargo(CargoDto cargo, UserDetails userDetails) {
-        customerService.addCargo(cargo, userDetails);
+    public void addCargo(CargoDto cargo) {
+        customerService.addCargo(cargo);
     }
 }

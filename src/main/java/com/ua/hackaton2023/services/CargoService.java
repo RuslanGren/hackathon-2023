@@ -6,6 +6,8 @@ import com.ua.hackaton2023.entity.CarrierResponse;
 import com.ua.hackaton2023.entity.Customer;
 import com.ua.hackaton2023.web.cargo.CargoDto;
 
+import java.util.List;
+
 public interface CargoService {
     Cargo createCargo(CargoDto cargoDto, Customer customer);
 

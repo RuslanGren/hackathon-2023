@@ -8,9 +8,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -18,39 +18,42 @@ import org.springframework.web.bind.annotation.*;
 public class CustomerController {
     private final CustomerService customerService;
 
-    @PostMapping("/cargo/add")
-    public ResponseEntity<Customer> addCargo(
-            @Valid @RequestBody CargoDto cargoDto,
-            @AuthenticationPrincipal UserDetails userDetails
-            ) {
-        return new ResponseEntity<>(customerService.addCargo(cargoDto, userDetails), HttpStatus.OK);
+    @GetMapping("/{id}/cargos")
+    public ResponseEntity<List<Cargo>> getCargosByUser(
+            @PathVariable(name = "id") Long id
+    ) {
+        return new ResponseEntity<>(customerService.getCargosByUser(id), HttpStatus.OK);
     }
 
-    @DeleteMapping("/cargo/delete")
+    @PostMapping("/cargos/add")
+    public ResponseEntity<Customer> addCargo(
+            @Valid @RequestBody CargoDto cargoDto
+            ) {
+        return new ResponseEntity<>(customerService.addCargo(cargoDto), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/cargos/delete")
     public ResponseEntity<?> deleteCargo(
-        @RequestParam("cargoId") Long cargoId,
-        @AuthenticationPrincipal UserDetails userDetails
+        @RequestParam("cargoId") Long cargoId
     ) {
-        customerService.deleteCargo(cargoId, userDetails);
+        customerService.deleteCargo(cargoId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PatchMapping("/cargo/choose")
+    @PatchMapping("/cargos/choose")
     public ResponseEntity<Cargo> chooseCargoCarrier(
             @RequestParam("cargoId") Long cargoId,
-            @RequestParam("carrierResponseId") Long carrierResponseId,
-            @AuthenticationPrincipal UserDetails userDetails
+            @RequestParam("carrierResponseId") Long carrierResponseId
     ) {
-        return new ResponseEntity<>(customerService.chooseCargoCarrier(cargoId, carrierResponseId, userDetails),
+        return new ResponseEntity<>(customerService.chooseCargoCarrier(cargoId, carrierResponseId),
                 HttpStatus.OK);
     }
 
-    @PatchMapping("/cargo/finish")
+    @PatchMapping("/cargos/finish")
     public ResponseEntity<Cargo> finishCargo(
             @RequestParam("cargoId") Long cargoId,
-            @RequestParam("stars") int stars,
-            @AuthenticationPrincipal UserDetails userDetails
+            @RequestParam("stars") int stars
     ) {
-        return new ResponseEntity<>(customerService.finishCargo(cargoId, stars, userDetails), HttpStatus.OK);
+        return new ResponseEntity<>(customerService.finishCargo(cargoId, stars), HttpStatus.OK);
     }
 }

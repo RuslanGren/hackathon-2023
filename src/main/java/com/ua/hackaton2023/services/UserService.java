@@ -6,6 +6,8 @@ import com.ua.hackaton2023.web.user.RegistrationUserDto;
 import java.util.Optional;
 
 public interface UserService {
+    User getUser();
+
     Optional<User> findByEmail(String email);
 
     User createNewUser(RegistrationUserDto registrationUserDto);

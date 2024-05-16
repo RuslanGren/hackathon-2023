@@ -9,5 +9,5 @@ public interface TelegramService {
 
     UserDetails getUserDetails(User user);
 
-    void addCargo(CargoDto cargo, UserDetails userDetails);
+    void addCargo(CargoDto cargo);
 }

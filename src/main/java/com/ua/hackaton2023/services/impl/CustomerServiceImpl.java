@@ -1,6 +1,7 @@
 package com.ua.hackaton2023.services.impl;
 
 import com.ua.hackaton2023.entity.*;
+import com.ua.hackaton2023.exceptions.BadRequestException;
 import com.ua.hackaton2023.exceptions.cargo.CargoAccessDeniedException;
 import com.ua.hackaton2023.exceptions.carrier.CarrierNotFoundException;
 import com.ua.hackaton2023.exceptions.carrier.CarrierResponseNotFoundException;
@@ -13,7 +14,6 @@ import com.ua.hackaton2023.services.CarrierService;
 import com.ua.hackaton2023.services.CustomerService;
 import com.ua.hackaton2023.web.cargo.CargoDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,19 +25,25 @@ public class CustomerServiceImpl implements CustomerService {
     private final CargoService cargoService;
     private final CarrierResponseRepository carrierResponseRepository;
     private final CarrierService carrierService;
+    private final UserServiceImpl userService;
 
     private static final int MIN_RATING = 1;
     private static final int MAX_RATING = 5;
 
     @Override
-    public Customer getCustomerByUserDetails(UserDetails userDetails) {
-        return customerRepository.findByUser((User) userDetails);
+    public List<Cargo> getCargosByUser(Long id) {
+        return customerRepository.findById(id)
+                .orElseThrow(() -> new BadRequestException("Customer doesn't exists")).getCargoList();
     }
 
     @Override
-    public Customer addCargo(CargoDto cargoDto, UserDetails userDetails) {
-        Customer customer = getCustomerByUserDetails(userDetails);
+    public Customer getCustomer() {
+        return customerRepository.findByUser(userService.getUser());
+    }
 
+    @Override
+    public Customer addCargo(CargoDto cargoDto) {
+        Customer customer = getCustomer();
         Cargo cargo = cargoService.createCargo(cargoDto, customer);
         cargoService.saveCargo(cargo);
 
@@ -56,9 +62,9 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public void deleteCargo(Long cargoId, UserDetails userDetails) {
+    public void deleteCargo(Long cargoId) {
         Cargo cargo = cargoService.getCargoById(cargoId);
-        Customer customer = getCustomerByUserDetails(userDetails);
+        Customer customer = getCustomer();
         if (!cargo.getCustomer().equals(customer)) {
             throw new CustomerCargoAccessDeniedException();
         }
@@ -70,8 +76,8 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public Cargo chooseCargoCarrier(Long cargoId, Long carrierResponseId, UserDetails userDetails) {
-        Customer customer = getCustomerByUserDetails(userDetails);
+    public Cargo chooseCargoCarrier(Long cargoId, Long carrierResponseId) {
+        Customer customer = getCustomer();
         Cargo cargo = cargoService.getCargoById(cargoId);
         if (!cargo.getCustomer().equals(customer)) {
             throw new CargoAccessDeniedException();
@@ -91,11 +97,11 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public Cargo finishCargo(Long cargoId, int stars, UserDetails userDetails) {
+    public Cargo finishCargo(Long cargoId, int stars) {
         if (stars < MIN_RATING || stars > MAX_RATING) {
             throw new CargoFinishException();
         }
-        Customer customer = getCustomerByUserDetails(userDetails);
+        Customer customer = getCustomer();
         Cargo cargo = cargoService.getCargoById(cargoId);
         if (!cargo.getCustomer().equals(customer)) {
             throw new CargoAccessDeniedException();
