@@ -282,7 +282,6 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
                         "\nНазва: " + cargo.getName() +
                         "\nОпис: " + cargo.getDescription() +
                         "\nВага: " + cargo.getWeight() +
-                        "\nОб'єм: " + cargo.getVolume() +
                         "\nСтраховка: " + cargo.getInsurance() +
                         "\nПочаткова адресса: " + cargo.getStartAddress() +
                         "\nКінцева адресса: " + cargo.getEndAddress() +
@@ -404,9 +403,11 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
         row1.add(new KeyboardButton("Подивитись всі грузи"));
         row1.add(new KeyboardButton("Відповісти на груз"));
         row1.add(new KeyboardButton("Додати машину"));
-        row1.add(new KeyboardButton("Подивитися всі машини"));
-        row1.add(new KeyboardButton("Видалити машину"));
+        KeyboardRow row2 = new KeyboardRow();
+        row2.add(new KeyboardButton("Подивитися всі машини"));
+        row2.add(new KeyboardButton("Видалити машину"));
         keyboard.add(row1);
+        keyboard.add(row2);
         keyboardMarkup.setKeyboard(keyboard);
         message.setReplyMarkup(keyboardMarkup);
 
