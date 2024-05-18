@@ -1,5 +1,6 @@
 package com.ua.hackaton2023.util;
 
+import com.ua.hackaton2023.entity.Car;
 import com.ua.hackaton2023.entity.Cargo;
 import com.ua.hackaton2023.entity.User;
 import com.ua.hackaton2023.services.TelegramService;
@@ -45,83 +46,188 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        Message message = update.getMessage();
-        Long chatId = message.getChatId();
-        if ("/start".equals(message.getText())) {
-            sendLoginButton(chatId);
-        } else if ("Увійти".equals(message.getText())) {
-            handleLogin(chatId, message);
-
+        if (update.hasMessage() && update.getMessage().hasText()) {
+            handleIncomingMessage(update.getMessage());
         }
-
-
     }
 
-    private void cargoFunctional(Message message) {
+    private void handleIncomingMessage(Message message) {
         Long chatId = message.getChatId();
         String text = message.getText();
 
+        if (text.equals("/start")) {
+            sendLoginButton(chatId);
+        } else if (text.equals("Увійти")) {
+            handleLogin(chatId);
+        } else {
+            User user = telegramService.getUserByChatId(chatId);
+            if (user != null) {
+                String role = user.getRoles().stream().findFirst().get().getName();
+                String state = userStates.get(chatId);
 
-            String state = userStates.get(chatId);
-            System.out.println("Current state: " + state); // Debugging line
-            if (state != null) {
-                switch (state) {
-                    case "ADD_CARGO_NAME":
-                        handleAddCargoName(chatId, text);
-                        break;
-                    case "ADD_CARGO_WEIGHT":
-                        handleAddCargoWeight(chatId, text);
-                        break;
-                    case "ADD_CARGO_START":
-                        handleAddCargoStart(chatId, text);
-                        break;
-                    case "ADD_CARGO_END":
-                        handleAddCargoEnd(chatId, text);
-                        break;
-                    case "DELETE_CARGO":
-                        handleDeleteCargo(chatId, text);
-                        break;
-                    default:
-                        userStates.remove(chatId); // Clear state if unrecognized
-                        sendCustomerMenu(chatId); // Show menu again
-                        break;
+                if (state != null) {
+                    if (role.equals("ROLE_CUSTOMER")) {
+                        handleCustomerStates(chatId, text, state);
+                    } else if (role.equals("ROLE_CARRIER")) {
+                        handleCarrierStates(chatId, text, state);
+                    }
+                } else {
+                    if (role.equals("ROLE_CUSTOMER")) {
+                        handleCustomerMenu(chatId, text);
+                    } else if (role.equals("ROLE_CARRIER")) {
+                        handleCarrierMenu(chatId, text);
+                    }
                 }
             } else {
-                switch (text) {
-                    case "Додати груз":
-                        startAddCargoProcess(chatId);
-                        break;
-                    case "Видалити груз":
-                        startDeleteCargoProcess(chatId);
-                        break;
-                    case "Показати всі грузи користувача":
-                        showUserCargos(chatId);
-                        break;
-                    default:
-                        sendCustomerMenu(chatId);
-                        break;
-                }
+                sendMessage(chatId, "Користувача не знайдено.");
             }
         }
-
-
-    private void startAddCargoProcess(Long chatId) {
-        userStates.put(chatId, "ADD_CARGO_NAME");
-        System.out.println("State set to ADD_CARGO_NAME for chatId: " + chatId); // Debugging line
-        sendMessage(chatId, "Введіть назву грузу:");
     }
 
-    private void startDeleteCargoProcess(Long chatId) {
-        userStates.put(chatId, "DELETE_CARGO");
-        sendMessage(chatId, "Введіть ID грузу для видалення:");
+    private void handleCustomerStates(Long chatId, String text, String state) {
+        switch (state) {
+            case "ADD_CARGO_NAME":
+                handleAddCargoName(chatId, text);
+                break;
+            case "ADD_CARGO_WEIGHT":
+                handleAddCargoWeight(chatId, text);
+                break;
+            case "ADD_CARGO_START":
+                handleAddCargoStart(chatId, text);
+                break;
+            case "ADD_CARGO_END":
+                handleAddCargoEnd(chatId, text);
+                break;
+            case "DELETE_CARGO":
+                handleDeleteCargo(chatId, text);
+                break;
+            default:
+                userStates.remove(chatId); // Clear state if unrecognized
+                sendCustomerMenu(chatId); // Show menu again
+                break;
+        }
     }
 
-    private void showUserCargos(Long chatId) {
-        List<Cargo> cargoList = telegramService.getUserCargos();
+    private void handleCustomerMenu(Long chatId, String text) {
+        switch (text) {
+            case "Додати груз":
+                startAddCargoProcess(chatId);
+                break;
+            case "Видалити груз":
+                startDeleteCargoProcess(chatId);
+                break;
+            case "Показати всі грузи користувача":
+                showUserCargos(chatId);
+                break;
+            default:
+                sendCustomerMenu(chatId);
+                break;
+        }
+    }
+
+    private void handleCarrierStates(Long chatId, String text, String state) {
+        switch (state) {
+            case "ADD_CAR_NAME":
+                handleAddCarName(chatId, text);
+                break;
+            case "ADD_CAR_WEIGHT":
+                handleAddCarWeight(chatId, text);
+                break;
+            case "ADD_CAR_VOLUME":
+                handleAddCarVolume(chatId, text);
+                break;
+            case "ADD_CAR_INSURANCE":
+                handleAddCarInsurance(chatId, text);
+                break;
+            case "DELETE_CAR":
+                handleDeleteCar(chatId, text);
+                break;
+            default:
+                userStates.remove(chatId); // Clear state if unrecognized
+                sendCarrierMenu(chatId); // Show menu again
+                break;
+        }
+    }
+
+    private void startAddCarProcess(Long chatId) {
+        userStates.put(chatId, "ADD_CAR_NAME");
+        sendMessage(chatId, "Введіть назву машини:");
+    }
+
+    private void handleAddCarName(Long chatId, String name) {
+        CarDto car = new CarDto();
+        car.setName(name);
+        carDrafts.put(chatId, car);
+        userStates.put(chatId, "ADD_CAR_WEIGHT");
+        sendMessage(chatId, "Введіть вагу машини:");
+    }
+
+    private void handleAddCarWeight(Long chatId, String weight) {
+        CarDto car = carDrafts.get(chatId);
+        if (car != null) {
+            car.setWeight(Double.parseDouble(weight));
+            userStates.put(chatId, "ADD_CAR_VOLUME");
+            sendMessage(chatId, "Введіть об'єм машини:");
+        }
+    }
+
+    private void handleAddCarVolume(Long chatId, String volume) {
+        CarDto car = carDrafts.get(chatId);
+        if (car != null) {
+            car.setVolume(Double.parseDouble(volume));
+            userStates.put(chatId, "ADD_CAR_INSURANCE");
+            sendMessage(chatId, "Введіть інформацію про страховку:");
+        }
+    }
+
+    private void handleAddCarInsurance(Long chatId, String insurance) {
+        CarDto car = carDrafts.get(chatId);
+        if (car != null) {
+            car.setInsurance(insurance);
+            telegramService.addCar(car);
+            userStates.remove(chatId);
+            carDrafts.remove(chatId);
+            sendMessage(chatId, "Машину додано успішно.");
+        }
+    }
+
+    private void startDeleteCarProcess(Long chatId) {
+        userStates.put(chatId, "DELETE_CAR");
+        sendMessage(chatId, "Введіть ID машини для видалення:");
+    }
+
+    private void handleDeleteCar(Long chatId, String carId) {
+        sendMessage(chatId, telegramService.deleteCar(carId));
+        userStates.remove(chatId);
+    }
+
+    private void showAllCars(Long chatId) {
+        List<Car> carList = telegramService.getAllCars();
+        if (!carList.isEmpty()) {
+            for (Car car : carList) {
+                String str = "\nID машини: " + car.getId() +
+                        "\nНазва: " + car.getName() +
+                        "\nВага: " + car.getWeight() +
+                        "\nОб'єм: " + car.getVolume() +
+                        "\nСтраховка: " + car.getInsurance();
+
+                sendMessage(chatId, str);
+            }
+        } else {
+            sendMessage(chatId, "У вас немає машин");
+        }
+    }
+
+    private void startRespondToCargoProcess(Long chatId) {
+        userStates.put(chatId, "RESPOND_TO_CARGO");
+        sendMessage(chatId, "Введіть ID грузу для відповіді:");
+    }
+
+    private void showAllCargos(Long chatId) {
+        List<Cargo> cargoList = telegramService.getAllCargos();
         if (!cargoList.isEmpty()) {
-            String str;
             for (Cargo cargo : cargoList) {
-                str = "\nID груза: " + cargo.getId() +
+                String str = "\nID груза: " + cargo.getId() +
                         "\nНазва: " + cargo.getName() +
                         "\nОпис: " + cargo.getDescription() +
                         "\nВага: " + cargo.getWeight() +
@@ -136,7 +242,33 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
                 sendMessage(chatId, str);
             }
         } else {
-            sendMessage(chatId, "У вас немає грузів");
+            sendMessage(chatId, "Немає доступних грузів");
+        }
+    }
+
+
+
+
+    private void handleCarrierMenu(Long chatId, String text) {
+        switch (text) {
+            case "Подивитись всі грузи":
+                showAllCargos(chatId);
+                break;
+            case "Відповісти на груз":
+                startRespondToCargoProcess(chatId);
+                break;
+            case "Додати машину":
+                startAddCarProcess(chatId);
+                break;
+            case "Подивитися всі машини":
+                showAllCars(chatId);
+                break;
+            case "Видалити машину":
+                startDeleteCarProcess(chatId);
+                break;
+            default:
+                sendCarrierMenu(chatId);
+                break;
         }
     }
 
@@ -163,7 +295,7 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
         }
     }
 
-    private void handleLogin(Long chatId, Message message) {
+    private void handleLogin(Long chatId) {
         User user = telegramService.getUserByChatId(chatId);
         if (user != null) {
             UserDetails userDetails = telegramService.getUserDetails(user.getEmail());
@@ -175,7 +307,6 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
                 sendCustomerMenu(chatId);
             } else if (role.equals("ROLE_CARRIER")) {
                 sendCarrierMenu(chatId);
-                cargoFunctional(message);
             }
         } else {
             sendMessage(chatId, "Користувача не знайдено.");
@@ -234,6 +365,42 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
             System.out.println(e.getMessage());
         }
     }
+
+    private void startAddCargoProcess(Long chatId) {
+        userStates.put(chatId, "ADD_CARGO_NAME");
+        System.out.println("State set to ADD_CARGO_NAME for chatId: " + chatId); // Debugging line
+        sendMessage(chatId, "Введіть назву грузу:");
+    }
+
+    private void startDeleteCargoProcess(Long chatId) {
+        userStates.put(chatId, "DELETE_CARGO");
+        sendMessage(chatId, "Введіть ID грузу для видалення:");
+    }
+
+    private void showUserCargos(Long chatId) {
+        List<Cargo> cargoList = telegramService.getUserCargos();
+        if (!cargoList.isEmpty()) {
+            String str;
+            for (Cargo cargo : cargoList) {
+                str = "\nID груза: " + cargo.getId() +
+                        "\nНазва: " + cargo.getName() +
+                        "\nОпис: " + cargo.getDescription() +
+                        "\nВага: " + cargo.getWeight() +
+                        "\nОб'єм: " + cargo.getVolume() +
+                        "\nСтраховка: " + cargo.getInsurance() +
+                        "\nПочаткова адресса: " + cargo.getStartAddress() +
+                        "\nКінцева адресса: " + cargo.getEndAddress() +
+                        "\nАктивний: " + cargo.isActive() +
+                        "\nЗавершений: " + cargo.isFinished() +
+                        "\nДата: " + cargo.getDate();
+
+                sendMessage(chatId, str);
+            }
+        } else {
+            sendMessage(chatId, "У вас немає грузів");
+        }
+    }
+
 
     private void handleAddCargoName(Long chatId, String name) {
         CargoDto cargo = new CargoDto();

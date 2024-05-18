@@ -67,6 +67,11 @@ public class CarrierServiceImpl implements CarrierService {
     }
 
     @Override
+    public List<Car> getUserCars() {
+        return getCarrier().getCars();
+    }
+
+    @Override
     public Carrier addCars(List<CarDto> carDtos) {
         Carrier carrier = getCarrier();
 

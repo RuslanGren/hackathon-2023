@@ -6,9 +6,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
-@Builder
+@NoArgsConstructor
 public class CarDto {
     @NotBlank(message = "Імя не повинно бути пустим")
     @Size(max = 255, message = "Імя занадто велике")

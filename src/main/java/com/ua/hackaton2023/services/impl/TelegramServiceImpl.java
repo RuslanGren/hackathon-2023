@@ -1,11 +1,15 @@
 package com.ua.hackaton2023.services.impl;
 
+import com.ua.hackaton2023.entity.Car;
 import com.ua.hackaton2023.entity.Cargo;
 import com.ua.hackaton2023.entity.User;
 import com.ua.hackaton2023.exceptions.BadRequestException;
+import com.ua.hackaton2023.services.CargoService;
+import com.ua.hackaton2023.services.CarrierService;
 import com.ua.hackaton2023.services.CustomerService;
 import com.ua.hackaton2023.services.TelegramService;
 import com.ua.hackaton2023.web.cargo.CargoDto;
+import com.ua.hackaton2023.web.carrier.CarDto;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,6 +22,8 @@ import java.util.List;
 public class TelegramServiceImpl implements TelegramService {
     private final UserServiceImpl userService;
     private final CustomerService customerService;
+    private final CarrierService carrierService;
+    private final CargoService cargoService;
 
     @Override
     @Transactional
@@ -51,5 +57,30 @@ public class TelegramServiceImpl implements TelegramService {
         } catch (Exception e) {
             return "Виникла помилка, попробуйте ще раз";
         }
+    }
+
+    @Override
+    public void addCar(CarDto carDto) {
+        carrierService.addCar(carDto);
+    }
+
+    @Override
+    public String deleteCar(String carId) {
+        try {
+            carrierService.deleteCar(Long.parseLong(carId));
+            return "Машина успішно видалений";
+        } catch (Exception e) {
+            return "Виникла помилка, попробуйте ще раз";
+        }
+    }
+
+    @Override
+    public List<Car> getAllCars() {
+        return carrierService.getUserCars();
+    }
+
+    @Override
+    public List<Cargo> getAllCargos() {
+        return cargoService.getAll();
     }
 }

@@ -1,8 +1,6 @@
 package com.ua.hackaton2023.services.impl;
 
 import com.ua.hackaton2023.entity.Cargo;
-import com.ua.hackaton2023.entity.Carrier;
-import com.ua.hackaton2023.entity.CarrierResponse;
 import com.ua.hackaton2023.entity.Customer;
 import com.ua.hackaton2023.exceptions.cargo.CargoNotFoundException;
 import com.ua.hackaton2023.repository.CargoRepository;
@@ -12,11 +10,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class CargoServiceImpl implements CargoService {
     private final CargoRepository cargoRepository;
+
+    @Override
+    public List<Cargo> getAll() {
+        return cargoRepository.findAll();
+    }
 
     @Override
     public Cargo createCargo(CargoDto cargoDto, Customer customer) {

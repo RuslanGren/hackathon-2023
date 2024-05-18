@@ -30,7 +30,7 @@ public class Carrier {
     @Column(name = "average_score")
     private double averageScore;
 
-    @OneToMany(mappedBy = "carrier")
+    @OneToMany(mappedBy = "carrier", fetch = FetchType.EAGER)
     @JsonManagedReference
     private List<Car> cars;
 

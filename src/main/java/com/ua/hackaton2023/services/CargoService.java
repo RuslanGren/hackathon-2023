@@ -16,4 +16,6 @@ public interface CargoService {
     Cargo getCargoById(Long id);
 
     void removeCargo(Cargo cargo);
+
+    List<Cargo> getAll();
 }
