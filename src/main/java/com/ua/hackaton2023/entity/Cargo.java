@@ -33,7 +33,7 @@ public class Cargo {
     private boolean isFinished;
     private LocalDate date;
 
-    @OneToMany(mappedBy = "cargo")
+    @OneToMany(mappedBy = "cargo", fetch = FetchType.EAGER)
     @JsonManagedReference
     private List<CarrierResponse> responses;
 

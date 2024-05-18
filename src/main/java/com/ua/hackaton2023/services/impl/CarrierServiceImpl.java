@@ -85,8 +85,8 @@ public class CarrierServiceImpl implements CarrierService {
     }
 
     @Override
-    public Carrier responseCargo(Long cargoId, CarrierResponseDto carrierResponseDto) {
-        Cargo cargo = cargoService.getCargoById(cargoId);
+    public Carrier responseCargo(CarrierResponseDto carrierResponseDto) {
+        Cargo cargo = cargoService.getCargoById(carrierResponseDto.getCargoId());
         if (!cargo.isActive()) {
             throw new CargoIsNotActiveException();
         }
@@ -120,7 +120,7 @@ public class CarrierServiceImpl implements CarrierService {
         cars.remove(car);
         carrier.setCars(cars);
 
-        carService.deleteCar(car);
         carrierRepository.save(carrier);
+        carService.deleteCar(car);
     }
 }

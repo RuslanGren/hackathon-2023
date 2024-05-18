@@ -6,6 +6,7 @@ import com.ua.hackaton2023.entity.User;
 import com.ua.hackaton2023.services.TelegramService;
 import com.ua.hackaton2023.web.cargo.CargoDto;
 import com.ua.hackaton2023.web.carrier.CarDto;
+import com.ua.hackaton2023.web.carrier.CarrierResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -33,6 +34,7 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
     private Map<Long, String> userStates = new HashMap<>();
     private Map<Long, CargoDto> cargoDrafts = new HashMap<>();
     private Map<Long, CarDto> carDrafts = new HashMap<>();
+    private Map<Long, CarrierResponseDto> responseDrafts = new HashMap<>();
 
     @Override
     public String getBotUsername() {
@@ -142,11 +144,65 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
             case "DELETE_CAR":
                 handleDeleteCar(chatId, text);
                 break;
+            case "RESPOND_TO_CARGO_ID":
+                handleRespondToCargoId(chatId, text);
+                break;
+            case "RESPOND_TO_CARGO_DESCRIPTION":
+                handleRespondToCargoDescription(chatId, text);
+                break;
+            case "RESPOND_TO_CARGO_COST":
+                handleRespondToCargoCost(chatId, text);
+                break;
             default:
                 userStates.remove(chatId); // Clear state if unrecognized
                 sendCarrierMenu(chatId); // Show menu again
                 break;
         }
+    }
+
+    private void handleRespondToCargoCost(Long chatId, String text) {
+        double cost;
+        try {
+            cost = Double.parseDouble(text);
+        } catch (Exception ignored) {
+            sendMessage(chatId, "Помилка, введіть число (якщо це раціональне число використовуйте крапку)");
+            return;
+        }
+        CarrierResponseDto carrierResponse = responseDrafts.get(chatId);
+        carrierResponse.setCost(cost);
+        telegramService.addCarrierResponse(carrierResponse);
+        responseDrafts.remove(chatId);
+        userStates.remove(chatId);
+        sendMessage(chatId, "Відгук на груз успішно відправлений");
+    }
+
+    private void handleRespondToCargoDescription(Long chatId, String description) {
+        CarrierResponseDto carrierResponse = responseDrafts.get(chatId);
+        if (carrierResponse != null) {
+            carrierResponse.setDescription(description);
+            userStates.put(chatId, "RESPOND_TO_CARGO_COST");
+            sendMessage(chatId, "Введіть вашу ціну:");
+        }
+    }
+
+    private void handleRespondToCargoId(Long chatId, String text) {
+        Long cargoId;
+        try {
+            cargoId = Long.parseLong(text);
+        } catch (Exception ignored) {
+            sendMessage(chatId, "Помилка, введіть число");
+            return;
+        }
+        CarrierResponseDto carrierResponse = new CarrierResponseDto();
+        carrierResponse.setCargoId(cargoId);
+        responseDrafts.put(chatId, carrierResponse);
+        userStates.put(chatId, "RESPOND_TO_CARGO_DESCRIPTION");
+        sendMessage(chatId, "Введіть сповіщення для відгуку:");
+    }
+
+    private void startRespondToCargoProcess(Long chatId) {
+        userStates.put(chatId, "RESPOND_TO_CARGO_ID");
+        sendMessage(chatId, "Введіть ID грузу для відповіді:");
     }
 
     private void startAddCarProcess(Long chatId) {
@@ -216,11 +272,6 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
         } else {
             sendMessage(chatId, "У вас немає машин");
         }
-    }
-
-    private void startRespondToCargoProcess(Long chatId) {
-        userStates.put(chatId, "RESPOND_TO_CARGO");
-        sendMessage(chatId, "Введіть ID грузу для відповіді:");
     }
 
     private void showAllCargos(Long chatId) {

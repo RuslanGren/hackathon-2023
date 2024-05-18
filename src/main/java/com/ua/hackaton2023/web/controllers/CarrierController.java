@@ -20,10 +20,9 @@ public class CarrierController {
 
     @PatchMapping("/cargo/response")
     public ResponseEntity<Carrier> responseCargo(
-            @RequestParam("cargoId") Long cargoId,
             @RequestBody CarrierResponseDto carrierResponseDto
     ) {
-        return new ResponseEntity<>(carrierService.responseCargo(cargoId, carrierResponseDto), HttpStatus.OK);
+        return new ResponseEntity<>(carrierService.responseCargo(carrierResponseDto), HttpStatus.OK);
     }
 
     @PostMapping("/add/car")

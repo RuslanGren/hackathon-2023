@@ -10,6 +10,7 @@ import com.ua.hackaton2023.services.CustomerService;
 import com.ua.hackaton2023.services.TelegramService;
 import com.ua.hackaton2023.web.cargo.CargoDto;
 import com.ua.hackaton2023.web.carrier.CarDto;
+import com.ua.hackaton2023.web.carrier.CarrierResponseDto;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -82,5 +83,10 @@ public class TelegramServiceImpl implements TelegramService {
     @Override
     public List<Cargo> getAllCargos() {
         return cargoService.getAll();
+    }
+
+    @Override
+    public void addCarrierResponse(CarrierResponseDto carrierResponseDto) {
+        carrierService.responseCargo(carrierResponseDto);
     }
 }

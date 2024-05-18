@@ -16,7 +16,7 @@ public interface CarrierService {
 
     Carrier addCars(List<CarDto> carDtos);
 
-    Carrier responseCargo(Long cargoId, CarrierResponseDto carrierResponseDto);
+    Carrier responseCargo(CarrierResponseDto carrierResponseDto);
 
     void deleteCar(Long carId);
 

@@ -34,7 +34,7 @@ public class Carrier {
     @JsonManagedReference
     private List<Car> cars;
 
-    @OneToMany(mappedBy = "carrier")
+    @OneToMany(mappedBy = "carrier", fetch = FetchType.EAGER)
     @JsonManagedReference
     private List<CarrierResponse> responses;
 
