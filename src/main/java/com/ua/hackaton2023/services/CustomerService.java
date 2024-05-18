@@ -1,6 +1,7 @@
 package com.ua.hackaton2023.services;
 
 import com.ua.hackaton2023.entity.Cargo;
+import com.ua.hackaton2023.entity.CarrierResponse;
 import com.ua.hackaton2023.entity.Customer;
 import com.ua.hackaton2023.entity.User;
 import com.ua.hackaton2023.web.cargo.CargoDto;
@@ -21,4 +22,6 @@ public interface CustomerService {
     Cargo finishCargo(Long cargoId, int stars);
 
     List<Cargo> getCargosByUser(Long id);
+
+    List<CarrierResponse> getAllCarrierResponsesByCustomerCargos();
 }

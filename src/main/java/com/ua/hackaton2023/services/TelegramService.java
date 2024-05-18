@@ -2,6 +2,7 @@ package com.ua.hackaton2023.services;
 
 import com.ua.hackaton2023.entity.Car;
 import com.ua.hackaton2023.entity.Cargo;
+import com.ua.hackaton2023.entity.CarrierResponse;
 import com.ua.hackaton2023.entity.User;
 import com.ua.hackaton2023.web.cargo.CargoDto;
 import com.ua.hackaton2023.web.carrier.CarDto;
@@ -30,4 +31,6 @@ public interface TelegramService {
     List<Cargo> getAllCargos();
 
     void addCarrierResponse(CarrierResponseDto carrierResponseDto);
+
+    List<CarrierResponse> getAllCarrierResponsesByCustomerCargos();
 }

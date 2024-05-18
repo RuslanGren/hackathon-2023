@@ -2,6 +2,7 @@ package com.ua.hackaton2023.services.impl;
 
 import com.ua.hackaton2023.entity.Car;
 import com.ua.hackaton2023.entity.Cargo;
+import com.ua.hackaton2023.entity.CarrierResponse;
 import com.ua.hackaton2023.entity.User;
 import com.ua.hackaton2023.exceptions.BadRequestException;
 import com.ua.hackaton2023.services.CargoService;
@@ -88,5 +89,10 @@ public class TelegramServiceImpl implements TelegramService {
     @Override
     public void addCarrierResponse(CarrierResponseDto carrierResponseDto) {
         carrierService.responseCargo(carrierResponseDto);
+    }
+
+    @Override
+    public List<CarrierResponse> getAllCarrierResponsesByCustomerCargos() {
+        return customerService.getAllCarrierResponsesByCustomerCargos();
     }
 }

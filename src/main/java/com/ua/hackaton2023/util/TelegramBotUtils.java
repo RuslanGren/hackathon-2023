@@ -2,6 +2,7 @@ package com.ua.hackaton2023.util;
 
 import com.ua.hackaton2023.entity.Car;
 import com.ua.hackaton2023.entity.Cargo;
+import com.ua.hackaton2023.entity.CarrierResponse;
 import com.ua.hackaton2023.entity.User;
 import com.ua.hackaton2023.services.TelegramService;
 import com.ua.hackaton2023.web.cargo.CargoDto;
@@ -31,10 +32,10 @@ import java.util.Map;
 public class TelegramBotUtils extends TelegramLongPollingBot {
     private final TelegramService telegramService;
 
-    private Map<Long, String> userStates = new HashMap<>();
-    private Map<Long, CargoDto> cargoDrafts = new HashMap<>();
-    private Map<Long, CarDto> carDrafts = new HashMap<>();
-    private Map<Long, CarrierResponseDto> responseDrafts = new HashMap<>();
+    private final Map<Long, String> userStates = new HashMap<>();
+    private final Map<Long, CargoDto> cargoDrafts = new HashMap<>();
+    private final Map<Long, CarDto> carDrafts = new HashMap<>();
+    private final Map<Long, CarrierResponseDto> responseDrafts = new HashMap<>();
 
     @Override
     public String getBotUsername() {
@@ -121,9 +122,28 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
             case "Огляд вантажів":
                 showUserCargos(chatId);
                 break;
+            case "Переглянути відповіді на грузи":
+                showResponses(chatId);
+                break;
             default:
                 sendCustomerMenu(chatId);
                 break;
+        }
+    }
+
+    private void showResponses(Long chatId) {
+        List<CarrierResponse> list = telegramService.getAllCarrierResponsesByCustomerCargos();
+        if (!list.isEmpty()) {
+            for (CarrierResponse response : list) {
+                String str = "\nID відгуку: " + response.getId() +
+                        "\nНазва перевізника: " + response.getCarrier().getName() +
+                        "\nТекст відгуку: " + response.getDescription() +
+                        "\nЦіна: " + response.getCost();
+
+                sendMessage(chatId, str);
+            }
+        } else {
+            sendMessage(chatId, "Відгуків на перевезення ваших грузів немає");
         }
     }
 
@@ -186,7 +206,7 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
     }
 
     private void handleRespondToCargoId(Long chatId, String text) {
-        Long cargoId;
+        long cargoId;
         try {
             cargoId = Long.parseLong(text);
         } catch (Exception ignored) {
@@ -378,6 +398,7 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
         row1.add("Додати вантаж");
         row1.add("Видалити вантаж");
         row1.add("Огляд вантажів");
+        row1.add("Переглянути відповіді на вантажі");
         keyboard.add(row1);
         keyboardMarkup.setKeyboard(keyboard);
         message.setReplyMarkup(keyboardMarkup);

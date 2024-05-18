@@ -37,6 +37,15 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
+    public List<CarrierResponse> getAllCarrierResponsesByCustomerCargos() {
+        return getCustomer()
+                .getCargoList()
+                .stream()
+                .flatMap(cargo -> cargo.getResponses().stream())
+                .toList();
+    }
+
+    @Override
     public Customer getCustomer() {
         return customerRepository.findByUser(userService.getUser());
     }
