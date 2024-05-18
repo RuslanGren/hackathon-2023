@@ -20,7 +20,6 @@ public class Hackaton2023Application {
             botsApi.registerBot(new TelegramBotUtils(telegramService));
         } catch (TelegramApiException ignored) {
         }
-
     }
 
 }

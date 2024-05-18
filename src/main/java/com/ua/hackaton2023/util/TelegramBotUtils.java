@@ -1,9 +1,13 @@
 package com.ua.hackaton2023.util;
 
+import com.ua.hackaton2023.entity.Cargo;
 import com.ua.hackaton2023.entity.User;
 import com.ua.hackaton2023.services.TelegramService;
 import com.ua.hackaton2023.web.cargo.CargoDto;
+import com.ua.hackaton2023.web.carrier.CarDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -11,19 +15,23 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
 public class TelegramBotUtils extends TelegramLongPollingBot {
     private final TelegramService telegramService;
-    private ConversationState conversationState = ConversationState.START;
 
+    private Map<Long, String> userStates = new HashMap<>();
+    private Map<Long, CargoDto> cargoDrafts = new HashMap<>();
+    private Map<Long, CarDto> carDrafts = new HashMap<>();
 
     @Override
     public String getBotUsername() {
@@ -31,238 +39,240 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
     }
 
     @Override
-    public void onUpdateReceived(Update update) {
-        Message message = update.getMessage();
-        Long chatId = message.getChatId();
-        if ("/start".equals(message.getText())) {
-            sendStartMessage(chatId);
-        }
-        
-        User user = handleAuthorisation(chatId, message.getText());
-        if (user != null) {
-            String role = user.getRoles().stream().findFirst().get().getName();
-            UserDetails userDetails = telegramService.getUserDetails(user);
-            if (role.equals("ROLE_CUSTOMER")) {
-                // TODO: customer class/method
-
-                keyBoardForCustomer(chatId, "Main menu");
-
-                    addCargo2(chatId, update);
-
-            } else if (role.equals("ROLE_CARRIER")) {
-                // TODO: carrier class/method
-                keyBoardForCarrier(chatId, "Main menu");
-            }
-        }
-    }
-
-
-    private void sendStartMessage(Long chatId) {
-        SendMessage message = new SendMessage();
-        message.setChatId(String.valueOf(chatId));
-        message.enableHtml(true);
-        message.setText(String.format("<b>Вітаю!</b> Спочатку увійдіть у свій профіль: http://localhost:8080/login?chatId=%d", chatId));
-
-        ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
-        keyboardMarkup.setSelective(true);
-        keyboardMarkup.setResizeKeyboard(true);
-        keyboardMarkup.setOneTimeKeyboard(true);
-
-        List<KeyboardRow> keyboard = new ArrayList<>();
-        KeyboardRow row = new KeyboardRow();
-        row.add("Перевірити");
-        keyboard.add(row);
-
-        keyboardMarkup.setKeyboard(keyboard);
-        message.setReplyMarkup(keyboardMarkup);
-
-
-        try {
-            execute(message);
-        } catch (TelegramApiException e) {
-            System.out.println(e.getMessage());
-        }
-
-    }
-
-    private User handleAuthorisation(Long chatId, String text) {
-
-        if ("Перевірити".equals(text)) {
-            try {
-                User user = telegramService.getUserByChatId(chatId);
-                sendMessage(chatId, "Ви успішно авторизувались!");
-                sendEmptyKeyboard(chatId, "Авторизація успішна!");
-                return user;
-            } catch (Exception ignored) {
-                sendMessage(chatId, "Cпроба увійти провалена, спробуйте ще раз!");
-                sendStartMessage(chatId);
-                return null;
-            }
-
-        } else {
-            return null;
-        }
-    }
-
-
-    private void sendMessage(Long chatID, String text) {
-        SendMessage message = new SendMessage();
-        message.setChatId(String.valueOf(chatID));
-        message.setText(text);
-        try {
-            execute(message);
-        } catch (TelegramApiException exception) {
-            exception.printStackTrace();
-        }
-
-    }
-
-    private void sendEmptyKeyboard(Long chatId, String text) {
-        SendMessage message = new SendMessage();
-        message.setChatId(String.valueOf(chatId));
-        message.setText(text);
-
-        // Очищення клавіатури
-        ReplyKeyboardRemove keyboardRemove = new ReplyKeyboardRemove();
-        keyboardRemove.setRemoveKeyboard(true);
-        message.setReplyMarkup(keyboardRemove);
-
-        try {
-            execute(message);
-        } catch (TelegramApiException exception) {
-            exception.printStackTrace();
-        }
-    }
-    private void keyBoardForCustomer(Long chatId, String text){
-        SendMessage message = new SendMessage();
-        message.setChatId(String.valueOf(chatId));
-        message.setText(text);
-        ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
-        keyboardMarkup.setSelective(true);
-        keyboardMarkup.setResizeKeyboard(true);
-        List<KeyboardRow> keyboard = new ArrayList<>();
-        KeyboardRow row1 = new KeyboardRow();
-        row1.add("Додати вантаж");
-        row1.add("Видалити вантаж");
-        row1.add("Усі вантажі");
-        keyboard.add(row1);
-        KeyboardRow row2 = new KeyboardRow();
-        row2.add("Вибрати перевізника");
-        row2.add("Завершити перевезення");
-        keyboard.add(row2);
-        keyboardMarkup.setKeyboard(keyboard);
-        message.setReplyMarkup(keyboardMarkup);
-
-        try {
-            execute(message);
-        } catch (TelegramApiException e) {
-            e.printStackTrace();
-        }
-
-    }
-    private  void keyBoardForCarrier(Long chatId, String text){
-        SendMessage message = new SendMessage();
-        message.setChatId(String.valueOf(chatId));
-        message.setText(text);
-
-        ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
-        keyboardMarkup.setSelective(true);
-        keyboardMarkup.setResizeKeyboard(true);
-        keyboardMarkup.setOneTimeKeyboard(false);
-
-        List<KeyboardRow> keyboard = new ArrayList<>();
-        KeyboardRow row1 = new KeyboardRow();
-        row1.add("Додати транспортний засіб");
-        row1.add("Видалити транспортний засіб");
-        row1.add("Відгукнутись на замовлення");
-        keyboard.add(row1);
-
-        keyboardMarkup.setKeyboard(keyboard);
-        message.setReplyMarkup(keyboardMarkup);
-
-        try {
-            execute(message);
-        } catch (TelegramApiException e) {
-            e.printStackTrace();
-        }
-    }
-    private enum ConversationState {
-        START,
-        NAME_RECEIVED,
-        WEIGHT_RECEIVED,
-        START_ADDRESS_RECEIVED,
-        END_ADDRESS_RECEIVED,
-        FINISH,
-        STOP
-    }
-
-    private void addCargo(Long chatId,  Update update, CargoDto cargo){
-
-
-        try {
-
-
-            switch (conversationState) {
-                case START:
-                    conversationState = ConversationState.NAME_RECEIVED;
-                    SendMessage nameMessage = new SendMessage();
-                    nameMessage.setChatId(String.valueOf(chatId));
-                    nameMessage.setText("Введіть назву вантажу:");
-                    execute(nameMessage);
-                    break;
-                case NAME_RECEIVED:
-                    String userResponse = update.getMessage().getText();
-                    cargo.setName(userResponse);
-                    conversationState = ConversationState.WEIGHT_RECEIVED;
-                    nameMessage = new SendMessage();
-                    nameMessage.setChatId(String.valueOf(chatId));
-                    nameMessage.setText("Введіть вагу вантажу:");
-                    execute(nameMessage);
-                    break;
-                case WEIGHT_RECEIVED:
-                    userResponse = update.getMessage().getText();
-                    cargo.setWeight(Double.parseDouble(userResponse));
-                    conversationState = ConversationState.START_ADDRESS_RECEIVED;
-                    nameMessage = new SendMessage();
-                    nameMessage.setChatId(String.valueOf(chatId));
-                    nameMessage.setText("Введіть початкову адресу ватнажу:");
-                    execute(nameMessage);
-                    break;
-                case START_ADDRESS_RECEIVED:
-                    userResponse = update.getMessage().getText();
-                    cargo.setStartAddress(userResponse);
-                    conversationState = ConversationState.END_ADDRESS_RECEIVED;
-                    nameMessage = new SendMessage();
-                    nameMessage.setChatId(String.valueOf(chatId));
-                    nameMessage.setText("Введіть кінцеву адресу вантажу:");
-                    execute(nameMessage);
-                    break;
-                case END_ADDRESS_RECEIVED:
-                    userResponse = update.getMessage().getText();
-                    cargo.setEndAddress(userResponse);
-                    conversationState = ConversationState.FINISH;
-                    nameMessage = new SendMessage();
-                    nameMessage.setChatId(String.valueOf(chatId));
-                    nameMessage.setText(String.format("Ви успішно добавили груз: %s %f %s %s", cargo.getName(), cargo.getWeight(), cargo.getStartAddress(), cargo.getEndAddress()));
-                    execute(nameMessage);
-                    break;
-            }
-        } catch (TelegramApiException e) {
-            System.out.println(e.getMessage());
-        }
-    }
-    private void addCargo2(Long chatId, Update update){
-        CargoDto cargo = new CargoDto();
-        addCargo(chatId, update, cargo);
-    }
-
-
-
-
-
-
-    @Override
     public String getBotToken() {
         return "6959322213:AAGjboBmXBH3PixnTip8bT6ISYRfIiI_c7E";
+    }
+
+    @Override
+    public void onUpdateReceived(Update update) {
+        if (update.hasMessage() && update.getMessage().hasText()) {
+            handleIncomingMessage(update.getMessage());
+        }
+    }
+
+    private void handleIncomingMessage(Message message) {
+        Long chatId = message.getChatId();
+        String text = message.getText();
+
+        if (text.equals("/start")) {
+            sendLoginButton(chatId);
+        } else if (text.equals("Увійти")) {
+            handleLogin(chatId);
+        } else {
+            String state = userStates.get(chatId);
+            System.out.println("Current state: " + state); // Debugging line
+            if (state != null) {
+                switch (state) {
+                    case "ADD_CARGO_NAME":
+                        handleAddCargoName(chatId, text);
+                        break;
+                    case "ADD_CARGO_WEIGHT":
+                        handleAddCargoWeight(chatId, text);
+                        break;
+                    case "ADD_CARGO_START":
+                        handleAddCargoStart(chatId, text);
+                        break;
+                    case "ADD_CARGO_END":
+                        handleAddCargoEnd(chatId, text);
+                        break;
+                    case "DELETE_CARGO":
+                        handleDeleteCargo(chatId, text);
+                        break;
+                    default:
+                        userStates.remove(chatId); // Clear state if unrecognized
+                        sendCustomerMenu(chatId); // Show menu again
+                        break;
+                }
+            } else {
+                switch (text) {
+                    case "Додати груз":
+                        startAddCargoProcess(chatId);
+                        break;
+                    case "Видалити груз":
+                        startDeleteCargoProcess(chatId);
+                        break;
+                    case "Показати всі грузи користувача":
+                        showUserCargos(chatId);
+                        break;
+                    default:
+                        sendCustomerMenu(chatId);
+                        break;
+                }
+            }
+        }
+    }
+
+    private void startAddCargoProcess(Long chatId) {
+        userStates.put(chatId, "ADD_CARGO_NAME");
+        System.out.println("State set to ADD_CARGO_NAME for chatId: " + chatId); // Debugging line
+        sendMessage(chatId, "Введіть назву грузу:");
+    }
+
+    private void startDeleteCargoProcess(Long chatId) {
+        userStates.put(chatId, "DELETE_CARGO");
+        sendMessage(chatId, "Введіть ID грузу для видалення:");
+    }
+
+    private void showUserCargos(Long chatId) {
+        List<Cargo> cargoList = telegramService.getUserCargos();
+        if (!cargoList.isEmpty()) {
+            String str;
+            for (Cargo cargo : cargoList) {
+                str = "\nID груза: " + cargo.getId() +
+                        "\nНазва: " + cargo.getName() +
+                        "\nОпис: " + cargo.getDescription() +
+                        "\nВага: " + cargo.getWeight() +
+                        "\nОб'єм: " + cargo.getVolume() +
+                        "\nСтраховка: " + cargo.getInsurance() +
+                        "\nПочаткова адресса: " + cargo.getStartAddress() +
+                        "\nКінцева адресса: " + cargo.getEndAddress() +
+                        "\nАктивний: " + cargo.isActive() +
+                        "\nЗавершений: " + cargo.isFinished() +
+                        "\nДата: " + cargo.getDate();
+
+                sendMessage(chatId, str);
+            }
+        } else {
+            sendMessage(chatId, "У вас немає грузів");
+        }
+    }
+
+    private void sendLoginButton(Long chatId) {
+        SendMessage message = new SendMessage();
+        message.setChatId(chatId.toString());
+        message.setText("Натисніть кнопку увійти, щоб продовжити");
+
+        ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+        List<KeyboardRow> keyboard = new ArrayList<>();
+        KeyboardRow row = new KeyboardRow();
+        row.add(new KeyboardButton("Увійти"));
+        keyboard.add(row);
+        keyboardMarkup.setKeyboard(keyboard);
+        message.setReplyMarkup(keyboardMarkup);
+
+        try {
+            execute(message);
+        } catch (TelegramApiException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private void handleLogin(Long chatId) {
+        User user = telegramService.getUserByChatId(chatId);
+        if (user != null) {
+            UserDetails userDetails = telegramService.getUserDetails(user.getEmail());
+            UsernamePasswordAuthenticationToken authenticationToken =
+                    new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            String role = user.getRoles().stream().findFirst().get().getName();
+            if (role.equals("ROLE_CUSTOMER")) {
+                sendCustomerMenu(chatId);
+            } else if (role.equals("ROLE_CARRIER")) {
+                sendCarrierMenu(chatId);
+            }
+        } else {
+            sendMessage(chatId, "Користувача не знайдено.");
+        }
+    }
+
+    private void sendCustomerMenu(Long chatId) {
+        SendMessage message = new SendMessage();
+        message.setChatId(chatId.toString());
+        message.setText("Виберіть опцію:");
+
+        ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+        List<KeyboardRow> keyboard = new ArrayList<>();
+        KeyboardRow row1 = new KeyboardRow();
+        row1.add(new KeyboardButton("Додати груз"));
+        row1.add(new KeyboardButton("Видалити груз"));
+        row1.add(new KeyboardButton("Показати всі грузи користувача"));
+        keyboard.add(row1);
+        keyboardMarkup.setKeyboard(keyboard);
+        message.setReplyMarkup(keyboardMarkup);
+
+        try {
+            execute(message);
+        } catch (TelegramApiException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private void sendCarrierMenu(Long chatId) {
+        SendMessage message = new SendMessage();
+        message.setChatId(chatId.toString());
+        message.setText("Виберіть опцію:");
+
+        ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+        List<KeyboardRow> keyboard = new ArrayList<>();
+        KeyboardRow row1 = new KeyboardRow();
+        row1.add(new KeyboardButton("Подивитись всі грузи"));
+        row1.add(new KeyboardButton("Відповісти на груз"));
+        row1.add(new KeyboardButton("Додати машину"));
+        row1.add(new KeyboardButton("Подивитися всі машини"));
+        row1.add(new KeyboardButton("Видалити машину"));
+        keyboard.add(row1);
+        keyboardMarkup.setKeyboard(keyboard);
+        message.setReplyMarkup(keyboardMarkup);
+
+        try {
+            execute(message);
+        } catch (TelegramApiException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private void handleAddCargoName(Long chatId, String name) {
+        CargoDto cargo = new CargoDto();
+        cargo.setName(name);
+        cargoDrafts.put(chatId, cargo);
+        userStates.put(chatId, "ADD_CARGO_WEIGHT");
+
+        sendMessage(chatId, "Введіть вагу грузу:");
+    }
+
+    private void handleAddCargoWeight(Long chatId, String weight) {
+        CargoDto cargo = cargoDrafts.get(chatId);
+        if (cargo != null) {
+            cargo.setWeight(Double.parseDouble(weight));
+            userStates.put(chatId, "ADD_CARGO_START");
+            sendMessage(chatId, "Введіть адресу відправлення:");
+        }
+    }
+
+    private void handleAddCargoStart(Long chatId, String startAddress) {
+        CargoDto cargo = cargoDrafts.get(chatId);
+        if (cargo != null) {
+            cargo.setStartAddress(startAddress);
+            userStates.put(chatId, "ADD_CARGO_END");
+            sendMessage(chatId, "Введіть адресу призначення:");
+        }
+    }
+
+    private void handleAddCargoEnd(Long chatId, String endAddress) {
+        CargoDto cargo = cargoDrafts.get(chatId);
+        if (cargo != null) {
+            cargo.setEndAddress(endAddress);
+            telegramService.addCargo(cargo);
+            userStates.remove(chatId);
+            cargoDrafts.remove(chatId);
+            sendMessage(chatId, "Груз додано успішно.");
+        }
+    }
+
+    private void handleDeleteCargo(Long chatId, String cargoId) {
+        sendMessage(chatId, telegramService.deleteCargo(cargoId));
+        userStates.remove(chatId);
+    }
+
+    private void sendMessage(Long chatId, String text) {
+        SendMessage message = new SendMessage();
+        message.setChatId(chatId.toString());
+        message.setText(text);
+
+        try {
+            execute(message);
+        } catch (TelegramApiException e) {
+            System.out.println(e.getMessage());
+        }
     }
 }

@@ -22,7 +22,7 @@ public class Customer {
     private String description;
     private String address;
 
-    @OneToMany(mappedBy = "customer")
+    @OneToMany(mappedBy = "customer", fetch = FetchType.EAGER)
     private List<Cargo> cargoList;
 
     @OneToOne
