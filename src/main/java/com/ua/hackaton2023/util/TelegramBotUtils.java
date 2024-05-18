@@ -45,20 +45,23 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        if (update.hasMessage() && update.getMessage().hasText()) {
-            handleIncomingMessage(update.getMessage());
+        Message message = update.getMessage();
+        Long chatId = message.getChatId();
+        if ("/start".equals(message.getText())) {
+            sendLoginButton(chatId);
+        } else if ("Увійти".equals(message.getText())) {
+            handleLogin(chatId, message);
+
         }
+
+
     }
 
-    private void handleIncomingMessage(Message message) {
+    private void cargoFunctional(Message message) {
         Long chatId = message.getChatId();
         String text = message.getText();
 
-        if (text.equals("/start")) {
-            sendLoginButton(chatId);
-        } else if (text.equals("Увійти")) {
-            handleLogin(chatId);
-        } else {
+
             String state = userStates.get(chatId);
             System.out.println("Current state: " + state); // Debugging line
             if (state != null) {
@@ -100,7 +103,7 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
                 }
             }
         }
-    }
+
 
     private void startAddCargoProcess(Long chatId) {
         userStates.put(chatId, "ADD_CARGO_NAME");
@@ -140,12 +143,15 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
     private void sendLoginButton(Long chatId) {
         SendMessage message = new SendMessage();
         message.setChatId(chatId.toString());
-        message.setText("Натисніть кнопку увійти, щоб продовжити");
+        message.setText("Вітаю. Спочатку увійдіть\n http://localhost:8080/register");
 
         ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+        keyboardMarkup.setSelective(true);
+        keyboardMarkup.setResizeKeyboard(true);
+        keyboardMarkup.setOneTimeKeyboard(true);
         List<KeyboardRow> keyboard = new ArrayList<>();
         KeyboardRow row = new KeyboardRow();
-        row.add(new KeyboardButton("Увійти"));
+        row.add("Увійти");
         keyboard.add(row);
         keyboardMarkup.setKeyboard(keyboard);
         message.setReplyMarkup(keyboardMarkup);
@@ -157,7 +163,7 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
         }
     }
 
-    private void handleLogin(Long chatId) {
+    private void handleLogin(Long chatId, Message message) {
         User user = telegramService.getUserByChatId(chatId);
         if (user != null) {
             UserDetails userDetails = telegramService.getUserDetails(user.getEmail());
@@ -169,6 +175,7 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
                 sendCustomerMenu(chatId);
             } else if (role.equals("ROLE_CARRIER")) {
                 sendCarrierMenu(chatId);
+                cargoFunctional(message);
             }
         } else {
             sendMessage(chatId, "Користувача не знайдено.");
@@ -181,11 +188,14 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
         message.setText("Виберіть опцію:");
 
         ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+        keyboardMarkup.setSelective(true);
+        keyboardMarkup.setResizeKeyboard(true);
+        keyboardMarkup.setOneTimeKeyboard(true);
         List<KeyboardRow> keyboard = new ArrayList<>();
         KeyboardRow row1 = new KeyboardRow();
-        row1.add(new KeyboardButton("Додати груз"));
-        row1.add(new KeyboardButton("Видалити груз"));
-        row1.add(new KeyboardButton("Показати всі грузи користувача"));
+        row1.add("Додати груз");
+        row1.add("Видалити груз");
+        row1.add("Показати всі грузи користувача");
         keyboard.add(row1);
         keyboardMarkup.setKeyboard(keyboard);
         message.setReplyMarkup(keyboardMarkup);
@@ -204,6 +214,10 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
 
         ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
         List<KeyboardRow> keyboard = new ArrayList<>();
+        keyboardMarkup.setSelective(true);
+        keyboardMarkup.setResizeKeyboard(true);
+        keyboardMarkup.setOneTimeKeyboard(true);
+
         KeyboardRow row1 = new KeyboardRow();
         row1.add(new KeyboardButton("Подивитись всі грузи"));
         row1.add(new KeyboardButton("Відповісти на груз"));
