@@ -112,13 +112,13 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
 
     private void handleCustomerMenu(Long chatId, String text) {
         switch (text) {
-            case "Додати груз":
+            case "Додати вантаж":
                 startAddCargoProcess(chatId);
                 break;
-            case "Видалити груз":
+            case "Видалити вантаж":
                 startDeleteCargoProcess(chatId);
                 break;
-            case "Показати всі грузи користувача":
+            case "Огляд вантажів":
                 showUserCargos(chatId);
                 break;
             default:
@@ -173,7 +173,7 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
         telegramService.addCarrierResponse(carrierResponse);
         responseDrafts.remove(chatId);
         userStates.remove(chatId);
-        sendMessage(chatId, "Відгук на груз успішно відправлений");
+        sendMessage(chatId, "Відгук після перевезення вантажу успішно відправлений");
     }
 
     private void handleRespondToCargoDescription(Long chatId, String description) {
@@ -202,12 +202,12 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
 
     private void startRespondToCargoProcess(Long chatId) {
         userStates.put(chatId, "RESPOND_TO_CARGO_ID");
-        sendMessage(chatId, "Введіть ID грузу для відповіді:");
+        sendMessage(chatId, "Введіть ID вантажу для відповіді:");
     }
 
     private void startAddCarProcess(Long chatId) {
         userStates.put(chatId, "ADD_CAR_NAME");
-        sendMessage(chatId, "Введіть назву машини:");
+        sendMessage(chatId, "Введіть назву транспортний засіб:");
     }
 
     private void handleAddCarName(Long chatId, String name) {
@@ -215,7 +215,7 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
         car.setName(name);
         carDrafts.put(chatId, car);
         userStates.put(chatId, "ADD_CAR_WEIGHT");
-        sendMessage(chatId, "Введіть вагу машини:");
+        sendMessage(chatId, "Введіть вагу транспортний засіб:");
     }
 
     private void handleAddCarWeight(Long chatId, String weight) {
@@ -223,7 +223,7 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
         if (car != null) {
             car.setWeight(Double.parseDouble(weight));
             userStates.put(chatId, "ADD_CAR_VOLUME");
-            sendMessage(chatId, "Введіть об'єм машини:");
+            sendMessage(chatId, "Введіть об'єм транспортний засіб:");
         }
     }
 
@@ -243,13 +243,13 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
             telegramService.addCar(car);
             userStates.remove(chatId);
             carDrafts.remove(chatId);
-            sendMessage(chatId, "Машину додано успішно.");
+            sendMessage(chatId, "транспортний засіб додано успішно.");
         }
     }
 
     private void startDeleteCarProcess(Long chatId) {
         userStates.put(chatId, "DELETE_CAR");
-        sendMessage(chatId, "Введіть ID машини для видалення:");
+        sendMessage(chatId, "Введіть ID транспортний засіб для видалення:");
     }
 
     private void handleDeleteCar(Long chatId, String carId) {
@@ -261,7 +261,7 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
         List<Car> carList = telegramService.getAllCars();
         if (!carList.isEmpty()) {
             for (Car car : carList) {
-                String str = "\nID машини: " + car.getId() +
+                String str = "\nID транспортного засобу: " + car.getId() +
                         "\nНазва: " + car.getName() +
                         "\nВага: " + car.getWeight() +
                         "\nОб'єм: " + car.getVolume() +
@@ -270,7 +270,7 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
                 sendMessage(chatId, str);
             }
         } else {
-            sendMessage(chatId, "У вас немає машин");
+            sendMessage(chatId, "У вас немає транспорних засобів");
         }
     }
 
@@ -278,13 +278,13 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
         List<Cargo> cargoList = telegramService.getAllCargos();
         if (!cargoList.isEmpty()) {
             for (Cargo cargo : cargoList) {
-                String str = "\nID груза: " + cargo.getId() +
+                String str = "\nID вантажу: " + cargo.getId() +
                         "\nНазва: " + cargo.getName() +
                         "\nОпис: " + cargo.getDescription() +
                         "\nВага: " + cargo.getWeight() +
                         "\nСтраховка: " + cargo.getInsurance() +
-                        "\nПочаткова адресса: " + cargo.getStartAddress() +
-                        "\nКінцева адресса: " + cargo.getEndAddress() +
+                        "\nПочаткова адреса: " + cargo.getStartAddress() +
+                        "\nКінцева адреса: " + cargo.getEndAddress() +
                         "\nАктивний: " + cargo.isActive() +
                         "\nЗавершений: " + cargo.isFinished() +
                         "\nДата: " + cargo.getDate();
@@ -292,7 +292,7 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
                 sendMessage(chatId, str);
             }
         } else {
-            sendMessage(chatId, "Немає доступних грузів");
+            sendMessage(chatId, "Немає доступних вантажів");
         }
     }
 
@@ -301,19 +301,19 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
 
     private void handleCarrierMenu(Long chatId, String text) {
         switch (text) {
-            case "Подивитись всі грузи":
+            case "Огляд вантажів":
                 showAllCargos(chatId);
                 break;
-            case "Відповісти на груз":
+            case "Відгукнутись на вантаж":
                 startRespondToCargoProcess(chatId);
                 break;
-            case "Додати машину":
+            case "Додати транспортний засіб":
                 startAddCarProcess(chatId);
                 break;
-            case "Подивитися всі машини":
+            case "Подивитися всі транспортні засоби":
                 showAllCars(chatId);
                 break;
-            case "Видалити машину":
+            case "Видалити транспортні засоби":
                 startDeleteCarProcess(chatId);
                 break;
             default:
@@ -325,7 +325,8 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
     private void sendLoginButton(Long chatId) {
         SendMessage message = new SendMessage();
         message.setChatId(chatId.toString());
-        message.setText("Вітаю. Спочатку увійдіть\n http://localhost:8080/register");
+        message.enableHtml(true);
+        message.setText("<b>Вас вітає логістична система перевезення вантажів для Сил Оборони України</b> \uD83D\uDE9B\nСпочатку увійдіть\n http://localhost:8080/register");
 
         ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
         keyboardMarkup.setSelective(true);
@@ -374,9 +375,9 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
         keyboardMarkup.setOneTimeKeyboard(true);
         List<KeyboardRow> keyboard = new ArrayList<>();
         KeyboardRow row1 = new KeyboardRow();
-        row1.add("Додати груз");
-        row1.add("Видалити груз");
-        row1.add("Показати всі грузи користувача");
+        row1.add("Додати вантаж");
+        row1.add("Видалити вантаж");
+        row1.add("Огляд вантажів");
         keyboard.add(row1);
         keyboardMarkup.setKeyboard(keyboard);
         message.setReplyMarkup(keyboardMarkup);
@@ -400,12 +401,12 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
         keyboardMarkup.setOneTimeKeyboard(true);
 
         KeyboardRow row1 = new KeyboardRow();
-        row1.add(new KeyboardButton("Подивитись всі грузи"));
-        row1.add(new KeyboardButton("Відповісти на груз"));
-        row1.add(new KeyboardButton("Додати машину"));
+        row1.add(new KeyboardButton("Огляд вантажів"));
+        row1.add(new KeyboardButton("Відгукнутись на вантаж"));
+        row1.add(new KeyboardButton("Додати транспортний засіб"));
         KeyboardRow row2 = new KeyboardRow();
-        row2.add(new KeyboardButton("Подивитися всі машини"));
-        row2.add(new KeyboardButton("Видалити машину"));
+        row2.add(new KeyboardButton("Подивитися всі транспортні засоби"));
+        row2.add(new KeyboardButton("Видалити транспортний засіб"));
         keyboard.add(row1);
         keyboard.add(row2);
         keyboardMarkup.setKeyboard(keyboard);
@@ -421,12 +422,12 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
     private void startAddCargoProcess(Long chatId) {
         userStates.put(chatId, "ADD_CARGO_NAME");
         System.out.println("State set to ADD_CARGO_NAME for chatId: " + chatId); // Debugging line
-        sendMessage(chatId, "Введіть назву грузу:");
+        sendMessage(chatId, "Введіть назву вантажу:");
     }
 
     private void startDeleteCargoProcess(Long chatId) {
         userStates.put(chatId, "DELETE_CARGO");
-        sendMessage(chatId, "Введіть ID грузу для видалення:");
+        sendMessage(chatId, "Введіть ID вантажу для видалення:");
     }
 
     private void showUserCargos(Long chatId) {
@@ -434,14 +435,14 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
         if (!cargoList.isEmpty()) {
             String str;
             for (Cargo cargo : cargoList) {
-                str = "\nID груза: " + cargo.getId() +
+                str = "\nID вантажу: " + cargo.getId() +
                         "\nНазва: " + cargo.getName() +
                         "\nОпис: " + cargo.getDescription() +
                         "\nВага: " + cargo.getWeight() +
                         "\nОб'єм: " + cargo.getVolume() +
                         "\nСтраховка: " + cargo.getInsurance() +
-                        "\nПочаткова адресса: " + cargo.getStartAddress() +
-                        "\nКінцева адресса: " + cargo.getEndAddress() +
+                        "\nПочаткова адреса: " + cargo.getStartAddress() +
+                        "\nКінцева адреса: " + cargo.getEndAddress() +
                         "\nАктивний: " + cargo.isActive() +
                         "\nЗавершений: " + cargo.isFinished() +
                         "\nДата: " + cargo.getDate();
@@ -449,7 +450,7 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
                 sendMessage(chatId, str);
             }
         } else {
-            sendMessage(chatId, "У вас немає грузів");
+            sendMessage(chatId, "У вас немає вантажів");
         }
     }
 
@@ -460,7 +461,7 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
         cargoDrafts.put(chatId, cargo);
         userStates.put(chatId, "ADD_CARGO_WEIGHT");
 
-        sendMessage(chatId, "Введіть вагу грузу:");
+        sendMessage(chatId, "Введіть вагу вантажу:");
     }
 
     private void handleAddCargoWeight(Long chatId, String weight) {
@@ -488,7 +489,8 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
             telegramService.addCargo(cargo);
             userStates.remove(chatId);
             cargoDrafts.remove(chatId);
-            sendMessage(chatId, "Груз додано успішно.");
+            sendMessage(chatId, "Вантаж додано успішно ✅");
+
         }
     }
 
