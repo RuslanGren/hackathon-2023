@@ -82,7 +82,7 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
 
         for (int i = 1; i <= 5; i++) {
             InlineKeyboardButton button = new InlineKeyboardButton();
-            button.setText(i + " зірочок");
+            button.setText(i + " ⭐");
             button.setCallbackData("rate_" + data.split("_")[1] + "_" + i); // Значення callbackData, що відповідає оцінці
             rowInline.add(button);
         }
