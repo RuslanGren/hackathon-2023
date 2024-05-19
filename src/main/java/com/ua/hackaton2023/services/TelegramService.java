@@ -33,4 +33,8 @@ public interface TelegramService {
     void addCarrierResponse(CarrierResponseDto carrierResponseDto);
 
     List<CarrierResponse> getAllCarrierResponsesByCustomerCargos();
+
+    String chooseCargoCarrier(String[] data);
+
+    String finishCargo(String[] data);
 }

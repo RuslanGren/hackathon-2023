@@ -95,4 +95,28 @@ public class TelegramServiceImpl implements TelegramService {
     public List<CarrierResponse> getAllCarrierResponsesByCustomerCargos() {
         return customerService.getAllCarrierResponsesByCustomerCargos();
     }
+
+    @Override
+    public String chooseCargoCarrier(String[] data) {
+        try {
+            Long cargoId = Long.parseLong(data[1]);
+            Long carrierResponseId = Long.parseLong(data[2]);
+            customerService.chooseCargoCarrier(cargoId, carrierResponseId);
+            return "Ви успішно прийняли відгук перевізника на ваш груз";
+        } catch (Exception exception) {
+            return "Помилка: " + exception.getMessage();
+        }
+    }
+
+    @Override
+    public String finishCargo(String[] data) {
+        try {
+            Long cargoId = Long.parseLong(data[1]);
+            int stars = Integer.parseInt(data[2]);
+            customerService.finishCargo(cargoId, stars);
+            return "Ви успішно завершили груз та оцінили перевізника на " + stars + " зірок";
+        } catch (Exception exception) {
+            return "Помилкка:" + exception.getMessage();
+        }
+    }
 }

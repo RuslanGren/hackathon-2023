@@ -15,9 +15,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -51,7 +54,56 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
             handleIncomingMessage(update.getMessage());
+        } else if (update.hasCallbackQuery()) {
+            handleCallbackQuery(update.getCallbackQuery());
         }
+    }
+
+    private void handleCallbackQuery(CallbackQuery callbackQuery) {
+        String data = callbackQuery.getData();
+        Long chatId = callbackQuery.getMessage().getChatId();
+
+        if (data.startsWith("finishCargo_")) {
+            handleFinishDeliveryButton(chatId, data);
+        }
+        if (data.startsWith("accept_")) {
+            handleAcceptButton(chatId, data);
+        }
+        if (data.startsWith("rate_")) {
+            handleRatingButton(chatId, data);
+        }
+    }
+
+    private void handleFinishDeliveryButton(Long chatId, String data) {
+        // Створюємо клавіатуру з кнопками оцінок
+        InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
+        List<InlineKeyboardButton> rowInline = new ArrayList<>();
+
+        for (int i = 1; i <= 5; i++) {
+            InlineKeyboardButton button = new InlineKeyboardButton();
+            button.setText(i + " зірочок");
+            button.setCallbackData("rate_" + data.split("_")[1] + "_" + i); // Значення callbackData, що відповідає оцінці
+            rowInline.add(button);
+        }
+        rowsInline.add(rowInline);
+        markupInline.setKeyboard(rowsInline);
+
+        // Відправляємо повідомлення з клавіатурою оцінок
+        SendMessage message = new SendMessage();
+        message.setChatId(chatId.toString());
+        message.setText("Оберіть оцінку:");
+        message.setReplyMarkup(markupInline);
+
+        try {
+            execute(message);
+        } catch (TelegramApiException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private void handleRatingButton(Long chatId, String data) {
+        sendMessage(chatId, telegramService.finishCargo(data.split("_")));
     }
 
     private void handleIncomingMessage(Message message) {
@@ -111,6 +163,8 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
         }
     }
 
+
+
     private void handleCustomerMenu(Long chatId, String text) {
         switch (text) {
             case "Додати вантаж":
@@ -122,7 +176,7 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
             case "Огляд вантажів":
                 showUserCargos(chatId);
                 break;
-            case "Переглянути відповіді на грузи":
+            case "Переглянути відповіді на вантажі":
                 showResponses(chatId);
                 break;
             default:
@@ -131,16 +185,45 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
         }
     }
 
+    private void handleAcceptButton(Long chatId, String data) {
+        sendMessage(chatId, telegramService.chooseCargoCarrier(data.split("_")));
+    }
+
     private void showResponses(Long chatId) {
         List<CarrierResponse> list = telegramService.getAllCarrierResponsesByCustomerCargos();
         if (!list.isEmpty()) {
             for (CarrierResponse response : list) {
-                String str = "\nID відгуку: " + response.getId() +
+                String str = "\nID грузу: " + response.getCargo().getId() +
                         "\nНазва перевізника: " + response.getCarrier().getName() +
                         "\nТекст відгуку: " + response.getDescription() +
                         "\nЦіна: " + response.getCost();
 
-                sendMessage(chatId, str);
+                SendMessage message = new SendMessage();
+                message.setChatId(chatId.toString());
+                message.setText(str);
+
+                // Створюємо інлайн-клавіатуру з кнопкою "Прийняти"
+                InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup();
+                List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
+                List<InlineKeyboardButton> rowInline = new ArrayList<>();
+                InlineKeyboardButton acceptButton = new InlineKeyboardButton();
+                acceptButton.setText("Прийняти");
+                // задаємо callback data
+                acceptButton.setCallbackData("accept_" + response.getCargo().getId() + "_" + response.getId());
+
+                // Додаємо кнопку до рядка та рядок до клавіатури
+                rowInline.add(acceptButton);
+                rowsInline.add(rowInline);
+                markupInline.setKeyboard(rowsInline);
+
+                // Встановлюємо клавіатуру повідомлення
+                message.setReplyMarkup(markupInline);
+
+                try {
+                    execute(message);
+                } catch (TelegramApiException e) {
+                    System.out.println(e.getMessage());
+                }
             }
         } else {
             sendMessage(chatId, "Відгуків на перевезення ваших грузів немає");
@@ -316,9 +399,6 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
         }
     }
 
-
-
-
     private void handleCarrierMenu(Long chatId, String text) {
         switch (text) {
             case "Огляд вантажів":
@@ -468,7 +548,32 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
                         "\nЗавершений: " + cargo.isFinished() +
                         "\nДата: " + cargo.getDate();
 
-                sendMessage(chatId, str);
+                if (!cargo.isActive() && !cargo.isFinished()) {
+                    SendMessage message = new SendMessage();
+                    message.setChatId(chatId.toString());
+                    message.setText(str);
+
+                    // Створюємо інлайн-клавіатуру з кнопкою "Завершити"
+                    InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup();
+                    List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
+                    List<InlineKeyboardButton> rowInline = new ArrayList<>();
+                    InlineKeyboardButton finishButton = new InlineKeyboardButton();
+                    finishButton.setText("Завершити груз та оцінити перевізника");
+                    finishButton.setCallbackData("finishCargo_" + cargo.getId());
+
+                    rowInline.add(finishButton);
+                    rowsInline.add(rowInline);
+                    markupInline.setKeyboard(rowsInline);
+
+                    message.setReplyMarkup(markupInline);
+                    try {
+                        execute(message);
+                    } catch (TelegramApiException e) {
+                        System.out.println(e.getMessage());
+                    }
+                } else {
+                    sendMessage(chatId, str);
+                }
             }
         } else {
             sendMessage(chatId, "У вас немає вантажів");

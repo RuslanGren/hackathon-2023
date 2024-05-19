@@ -42,6 +42,7 @@ public class CustomerServiceImpl implements CustomerService {
                 .getCargoList()
                 .stream()
                 .flatMap(cargo -> cargo.getResponses().stream())
+                .filter(response -> !response.isApplied()) // Фільтруємо відгуки, які не мають isApplied=true
                 .toList();
     }
 

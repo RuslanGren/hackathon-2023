@@ -23,10 +23,7 @@ public class AuthController {
     private final AuthService authService;
     private final TelegramServiceImpl telegramService;
 
-    @GetMapping("/test")
-    public ResponseEntity<?> test(@RequestParam Long chatId) {
-        return new ResponseEntity<>(telegramService.getUserByChatId(chatId), HttpStatus.OK);
-    }
+
 
     @PostMapping
     public ResponseEntity<JwtResponse> createAuthToken(
