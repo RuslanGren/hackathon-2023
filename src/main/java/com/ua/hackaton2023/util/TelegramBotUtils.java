@@ -112,16 +112,9 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
 
         if (text.equals("/start")) {
             sendLoginButton(chatId);
-        } else if (text.equals("Увійти")) {
-            handleLogin(chatId);
         } else {
             try {
-                User user = telegramService.getUserByChatId(chatId);
-                UserDetails userDetails = telegramService.getUserDetails(user.getEmail());
-                UsernamePasswordAuthenticationToken authenticationToken =
-                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-                String role = user.getRoles().stream().findFirst().get().getName();
+                String role = handleLogin(chatId);
                 String state = userStates.get(chatId);
 
                 if (state != null) {
@@ -138,8 +131,7 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
                     }
                 }
             } catch (Exception exception) {
-                exception.printStackTrace();
-                sendMessage(chatId, "Користувача не знайдено");
+                sendMessage(chatId, "Користувача не знайдено. Попробуйте авторизуватися знову");
             }
         }
     }
@@ -440,22 +432,13 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
         }
     }
 
-    private void handleLogin(Long chatId) {
-        try {
-            User user = telegramService.getUserByChatId(chatId);
-            UserDetails userDetails = telegramService.getUserDetails(user.getEmail());
-            UsernamePasswordAuthenticationToken authenticationToken =
-                    new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-            String role = user.getRoles().stream().findFirst().get().getName();
-            if (role.equals("ROLE_CUSTOMER")) {
-                sendCustomerMenu(chatId);
-            } else if (role.equals("ROLE_CARRIER")) {
-                sendCarrierMenu(chatId);
-            }
-        } catch (Exception ignored) {
-            sendMessage(chatId, "Користувача не знайдено");
-        }
+    private String handleLogin(Long chatId) {
+        User user = telegramService.getUserByChatId(chatId);
+        UserDetails userDetails = telegramService.getUserDetails(user.getEmail());
+        UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+        return user.getRoles().stream().findFirst().orElseThrow().getName();
     }
 
     private void sendCustomerMenu(Long chatId) {
@@ -550,7 +533,7 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
                     List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
                     List<InlineKeyboardButton> rowInline = new ArrayList<>();
                     InlineKeyboardButton finishButton = new InlineKeyboardButton();
-                    finishButton.setText("Завершити груз та оцінити перевізника");
+                    finishButton.setText("Завершити перевезення та оцінити перевізника");
                     finishButton.setCallbackData("finishCargo_" + cargo.getId());
 
                     rowInline.add(finishButton);
