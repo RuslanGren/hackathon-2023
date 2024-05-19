@@ -17,5 +17,5 @@ public interface CargoService {
 
     void removeCargo(Cargo cargo);
 
-    List<Cargo> getAll();
+    List<Cargo> getAllIsActive();
 }

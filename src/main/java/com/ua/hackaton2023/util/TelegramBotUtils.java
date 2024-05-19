@@ -205,6 +205,8 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
             for (CarrierResponse response : list) {
                 String str = "\nID грузу: " + response.getCargo().getId() +
                         "\nНазва перевізника: " + response.getCarrier().getName() +
+                        "\nРейтинг перевізника: " + response.getCarrier().getAverageScore() +
+                        "\nКількість відгуків: " + response.getCarrier().getTotalRatings() +
                         "\nТекст відгуку: " + response.getDescription() +
                         "\nЦіна: " + response.getCost();
 
@@ -367,7 +369,7 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
     }
 
     private void showAllCargos(Long chatId) {
-        List<Cargo> cargoList = telegramService.getAllCargos();
+        List<Cargo> cargoList = telegramService.getAllCargosIsActive();
         if (!cargoList.isEmpty()) {
             for (Cargo cargo : cargoList) {
                 String str = "\nID вантажу: " + cargo.getId() +
@@ -376,8 +378,6 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
                         "\nВага: " + cargo.getWeight() +
                         "\nПочаткова адреса: " + cargo.getStartAddress() +
                         "\nКінцева адреса: " + cargo.getEndAddress() +
-                        "\nАктивний: " + cargo.isActive() +
-                        "\nЗавершений: " + cargo.isFinished() +
                         "\nДата: " + cargo.getDate();
 
                 sendMessage(chatId, str);

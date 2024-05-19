@@ -28,7 +28,7 @@ public interface TelegramService {
 
     List<Car> getAllCars();
 
-    List<Cargo> getAllCargos();
+    List<Cargo> getAllCargosIsActive();
 
     String addCarrierResponse(CarrierResponseDto carrierResponseDto);
 

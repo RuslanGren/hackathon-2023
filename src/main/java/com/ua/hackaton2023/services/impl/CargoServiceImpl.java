@@ -18,8 +18,8 @@ public class CargoServiceImpl implements CargoService {
     private final CargoRepository cargoRepository;
 
     @Override
-    public List<Cargo> getAll() {
-        return cargoRepository.findAll();
+    public List<Cargo> getAllIsActive() {
+        return cargoRepository.findByIsActiveTrue();
     }
 
     @Override

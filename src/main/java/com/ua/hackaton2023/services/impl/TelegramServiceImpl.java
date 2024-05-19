@@ -77,8 +77,8 @@ public class TelegramServiceImpl implements TelegramService {
     }
 
     @Override
-    public List<Cargo> getAllCargos() {
-        return cargoService.getAll();
+    public List<Cargo> getAllCargosIsActive() {
+        return cargoService.getAllIsActive();
     }
 
     @Override
