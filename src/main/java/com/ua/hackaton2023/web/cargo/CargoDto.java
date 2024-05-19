@@ -23,10 +23,6 @@ public class CargoDto {
     @Max(value = 1_000_000, message = "Вага занадто велика")
     private double weight;
 
-    @Min(value = 0, message = "Обєм повинний бути більше нуля")
-    @Max(value = 1_000_000, message = "Обєм занадто великий")
-    private double volume;
-
     @NotBlank(message = "Початкова адресса не може бути пустою")
     @Size(max = 256, message = "Початкова адресса занадто довга")
     private String startAddress;
@@ -34,6 +30,4 @@ public class CargoDto {
     @NotBlank(message = "Кінцева адресса не може бути пустою")
     @Size(max = 256, message = "Кінцева адресса занадто довга")
     private String endAddress;
-
-    private String insurance;
 }

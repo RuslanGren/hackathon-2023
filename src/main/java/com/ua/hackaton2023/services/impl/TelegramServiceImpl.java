@@ -12,7 +12,6 @@ import com.ua.hackaton2023.services.TelegramService;
 import com.ua.hackaton2023.web.cargo.CargoDto;
 import com.ua.hackaton2023.web.carrier.CarDto;
 import com.ua.hackaton2023.web.carrier.CarrierResponseDto;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -28,30 +27,26 @@ public class TelegramServiceImpl implements TelegramService {
     private final CargoService cargoService;
 
     @Override
-    @Transactional
     public User getUserByChatId(Long chatId) {
        return userService.findByChatId(chatId).orElseThrow(() -> new BadRequestException("Error"));
     }
 
     @Override
-    @Transactional
     public UserDetails getUserDetails(String email) {
         return userService.loadUserByUsername(email);
     }
 
     @Override
-    @Transactional
     public void addCargo(CargoDto cargo) {
         customerService.addCargo(cargo);
     }
 
     @Override
-    @Transactional
     public List<Cargo> getUserCargos() {
         return customerService.getCargosByUser(customerService.getCustomer().getId());
     }
 
-    @Transactional
+    @Override
     public String deleteCargo(String cargoId) {
         try {
             customerService.deleteCargo(Long.parseLong(cargoId));

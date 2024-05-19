@@ -21,8 +21,6 @@ public class Cargo {
     private String name;
     private String description;
     private double weight;
-    private double volume;
-    private String insurance;
     @Column(name = "start_address")
     private String startAddress;
     @Column(name = "end_address")

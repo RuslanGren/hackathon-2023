@@ -21,8 +21,6 @@ public class CarServiceImpl implements CarService {
         return Car.builder()
                 .name(carDto.getName())
                 .weight(carDto.getWeight())
-                .volume(carDto.getVolume())
-                .insurance(carDto.getInsurance())
                 .carrier(carrier)
                 .build();
     }

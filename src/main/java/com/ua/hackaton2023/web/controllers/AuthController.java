@@ -1,9 +1,6 @@
 package com.ua.hackaton2023.web.controllers;
 
-import com.ua.hackaton2023.entity.User;
 import com.ua.hackaton2023.services.AuthService;
-import com.ua.hackaton2023.services.TelegramService;
-import com.ua.hackaton2023.services.impl.TelegramServiceImpl;
 import com.ua.hackaton2023.web.user.JwtRequest;
 import com.ua.hackaton2023.web.user.JwtResponse;
 import com.ua.hackaton2023.web.user.RegistrationUserDto;
@@ -21,9 +18,6 @@ import java.util.Optional;
 @RequestMapping("/api/auth")
 public class AuthController {
     private final AuthService authService;
-    private final TelegramServiceImpl telegramService;
-
-
 
     @PostMapping
     public ResponseEntity<JwtResponse> createAuthToken(

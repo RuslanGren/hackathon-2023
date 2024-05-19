@@ -19,8 +19,6 @@ public class Car {
     private Long id;
     private String name;
     private double weight;
-    private double volume;
-    private String insurance;
 
     @ManyToOne
     @JoinColumn(name = "carrier_id")
