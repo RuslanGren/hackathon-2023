@@ -117,6 +117,10 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
         } else {
             try {
                 User user = telegramService.getUserByChatId(chatId);
+                UserDetails userDetails = telegramService.getUserDetails(user.getEmail());
+                UsernamePasswordAuthenticationToken authenticationToken =
+                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                 String role = user.getRoles().stream().findFirst().get().getName();
                 String state = userStates.get(chatId);
 
@@ -133,7 +137,8 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
                         handleCarrierMenu(chatId, text);
                     }
                 }
-            } catch (Exception ignored) {
+            } catch (Exception exception) {
+                exception.printStackTrace();
                 sendMessage(chatId, "Користувача не знайдено");
             }
         }

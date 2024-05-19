@@ -86,7 +86,8 @@ public class TelegramServiceImpl implements TelegramService {
         try {
             carrierService.responseCargo(carrierResponseDto);
             return "Відгук після перевезення вантажу успішно відправлений";
-        } catch (Exception ignored) {
+        } catch (Exception exception) {
+            exception.printStackTrace();
             return "Помилка вводу, попробуйте ще раз (Можливо ви ввели не існуючий ID вантажу)";
         }
     }

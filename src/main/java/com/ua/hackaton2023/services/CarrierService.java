@@ -5,7 +5,6 @@ import com.ua.hackaton2023.entity.Carrier;
 import com.ua.hackaton2023.entity.User;
 import com.ua.hackaton2023.web.carrier.CarDto;
 import com.ua.hackaton2023.web.carrier.CarrierResponseDto;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.List;
 
