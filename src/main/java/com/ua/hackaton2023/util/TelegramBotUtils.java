@@ -136,6 +136,41 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
         }
     }
 
+    private void sendLoginButton(Long chatId) {
+        SendMessage message = new SendMessage();
+        message.setChatId(chatId.toString());
+        message.enableHtml(true);
+        message.setText("<b>Вас вітає логістична система перевезення вантажів для Сил Оборони України</b>" +
+                " \uD83D\uDE9B\nСпочатку увійдіть\n" +
+                "<a href='http://13.60.49.197/login?chatId=" + chatId + "'>Увійти</a>");
+
+        ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+        keyboardMarkup.setSelective(true);
+        keyboardMarkup.setResizeKeyboard(true);
+        keyboardMarkup.setOneTimeKeyboard(true);
+        List<KeyboardRow> keyboard = new ArrayList<>();
+        KeyboardRow row = new KeyboardRow();
+        row.add("Увійти");
+        keyboard.add(row);
+        keyboardMarkup.setKeyboard(keyboard);
+        message.setReplyMarkup(keyboardMarkup);
+
+        try {
+            execute(message);
+        } catch (TelegramApiException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private String handleLogin(Long chatId) {
+        User user = telegramService.getUserByChatId(chatId);
+        UserDetails userDetails = telegramService.getUserDetails(user.getEmail());
+        UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+        return user.getRoles().stream().findFirst().orElseThrow().getName();
+    }
+
     private void handleCustomerStates(Long chatId, String text, String state) {
         switch (state) {
             case "ADD_CARGO_NAME":
@@ -405,40 +440,6 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
                 sendCarrierMenu(chatId);
                 break;
         }
-    }
-
-    private void sendLoginButton(Long chatId) {
-        SendMessage message = new SendMessage();
-        message.setChatId(chatId.toString());
-        message.enableHtml(true);
-        message.setText("<b>Вас вітає логістична система перевезення вантажів для Сил Оборони України</b>" +
-                " \uD83D\uDE9B\nСпочатку увійдіть\nhttp://localhost:8080/login?chatId=" + chatId);
-
-        ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
-        keyboardMarkup.setSelective(true);
-        keyboardMarkup.setResizeKeyboard(true);
-        keyboardMarkup.setOneTimeKeyboard(true);
-        List<KeyboardRow> keyboard = new ArrayList<>();
-        KeyboardRow row = new KeyboardRow();
-        row.add("Увійти");
-        keyboard.add(row);
-        keyboardMarkup.setKeyboard(keyboard);
-        message.setReplyMarkup(keyboardMarkup);
-
-        try {
-            execute(message);
-        } catch (TelegramApiException e) {
-            System.out.println(e.getMessage());
-        }
-    }
-
-    private String handleLogin(Long chatId) {
-        User user = telegramService.getUserByChatId(chatId);
-        UserDetails userDetails = telegramService.getUserDetails(user.getEmail());
-        UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-        return user.getRoles().stream().findFirst().orElseThrow().getName();
     }
 
     private void sendCustomerMenu(Long chatId) {
