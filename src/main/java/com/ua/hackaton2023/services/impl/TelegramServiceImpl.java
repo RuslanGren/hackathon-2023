@@ -65,7 +65,7 @@ public class TelegramServiceImpl implements TelegramService {
     public String deleteCar(String carId) {
         try {
             carrierService.deleteCar(Long.parseLong(carId));
-            return "Машина успішно видалений";
+            return "Машина успішно видалена";
         } catch (Exception e) {
             return "Виникла помилка, попробуйте ще раз";
         }
@@ -82,8 +82,13 @@ public class TelegramServiceImpl implements TelegramService {
     }
 
     @Override
-    public void addCarrierResponse(CarrierResponseDto carrierResponseDto) {
-        carrierService.responseCargo(carrierResponseDto);
+    public String addCarrierResponse(CarrierResponseDto carrierResponseDto) {
+        try {
+            carrierService.responseCargo(carrierResponseDto);
+            return "Відгук після перевезення вантажу успішно відправлений";
+        } catch (Exception ignored) {
+            return "Помилка вводу, попробуйте ще раз (Можливо ви ввели не існуючий ID вантажу)";
+        }
     }
 
     @Override

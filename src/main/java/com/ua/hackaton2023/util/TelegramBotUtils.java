@@ -144,6 +144,9 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
             case "ADD_CARGO_NAME":
                 handleAddCargoName(chatId, text);
                 break;
+            case "ADD_CARGO_DESCRIPTION":
+                handleAddCargoDescription(chatId, text);
+                break;
             case "ADD_CARGO_WEIGHT":
                 handleAddCargoWeight(chatId, text);
                 break;
@@ -163,6 +166,14 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
         }
     }
 
+    private void handleAddCargoDescription(Long chatId, String description) {
+        CargoDto cargoDto = cargoDrafts.get(chatId);
+        if (cargoDto != null) {
+            cargoDto.setDescription(description);
+            userStates.put(chatId, "ADD_CARGO_WEIGHT");
+            sendMessage(chatId, "Введіть вагу вантажу:");
+        }
+    }
 
     private void handleCustomerMenu(Long chatId, String text) {
         switch (text) {
@@ -266,10 +277,9 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
         }
         CarrierResponseDto carrierResponse = responseDrafts.get(chatId);
         carrierResponse.setCost(cost);
-        telegramService.addCarrierResponse(carrierResponse);
         responseDrafts.remove(chatId);
         userStates.remove(chatId);
-        sendMessage(chatId, "Відгук після перевезення вантажу успішно відправлений");
+        sendMessage(chatId, telegramService.addCarrierResponse(carrierResponse));
     }
 
     private void handleRespondToCargoDescription(Long chatId, String description) {
@@ -314,14 +324,20 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
         sendMessage(chatId, "Введіть вантажопідйомність транспортного засобу:");
     }
 
-    private void handleAddCarWeight(Long chatId, String weight) {
-        CarDto car = carDrafts.get(chatId);
-        if (car != null) {
-            car.setWeight(Double.parseDouble(weight));
-            telegramService.addCar(car);
-            userStates.remove(chatId);
-            carDrafts.remove(chatId);
-            sendMessage(chatId, "Транспортний засіб успішно додано");
+    private void handleAddCarWeight(Long chatId, String text) {
+        double weight;
+        try {
+            weight = Double.parseDouble(text);
+            CarDto car = carDrafts.get(chatId);
+            if (car != null) {
+                car.setWeight(weight);
+                telegramService.addCar(car);
+                userStates.remove(chatId);
+                carDrafts.remove(chatId);
+                sendMessage(chatId, "Транспортний засіб успішно додано");
+            }
+        } catch (Exception ignored) {
+            sendMessage(chatId, "Помилка, введіть число");
         }
     }
 
@@ -385,7 +401,7 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
             case "Подивитися всі транспортні засоби":
                 showAllCars(chatId);
                 break;
-            case "Видалити транспортні засоби":
+            case "Видалити транспортний засіб":
                 startDeleteCarProcess(chatId);
                 break;
             default:
@@ -556,17 +572,23 @@ public class TelegramBotUtils extends TelegramLongPollingBot {
         CargoDto cargo = new CargoDto();
         cargo.setName(name);
         cargoDrafts.put(chatId, cargo);
-        userStates.put(chatId, "ADD_CARGO_WEIGHT");
+        userStates.put(chatId, "ADD_CARGO_DESCRIPTION");
 
-        sendMessage(chatId, "Введіть вагу вантажу:");
+        sendMessage(chatId, "Введіть додатковий опис вантажу:");
     }
 
-    private void handleAddCargoWeight(Long chatId, String weight) {
-        CargoDto cargo = cargoDrafts.get(chatId);
-        if (cargo != null) {
-            cargo.setWeight(Double.parseDouble(weight));
-            userStates.put(chatId, "ADD_CARGO_START");
-            sendMessage(chatId, "Введіть адресу відправлення:");
+    private void handleAddCargoWeight(Long chatId, String text) {
+        double weight;
+        try {
+            weight = Double.parseDouble(text);
+            CargoDto cargo = cargoDrafts.get(chatId);
+            if (cargo != null) {
+                cargo.setWeight(weight);
+                userStates.put(chatId, "ADD_CARGO_START");
+                sendMessage(chatId, "Введіть адресу відправлення:");
+            }
+        } catch (Exception ignored) {
+            sendMessage(chatId, "Помилка, введіть число");
         }
     }
 
