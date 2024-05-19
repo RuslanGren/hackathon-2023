@@ -104,6 +104,7 @@
             </select>
             <div class="error" th:if="${#fields.hasErrors('role')}" th:errors="*{role}">Role error</div>
         </div>
+        <input type="hidden" name="chatId" th:value="${chatId.isPresent() ? chatId.get() : ''}">
         <div th:if="${error}" class="error" th:text="${error}"></div>
         <div>
             <button type="submit">Register</button>

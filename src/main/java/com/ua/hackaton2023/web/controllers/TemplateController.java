@@ -42,26 +42,31 @@ public class TemplateController {
     }
 
     @GetMapping("/register")
-    public String displayRegisterPage(Model model) {
+    public String displayRegisterPage(@RequestParam(required = false) Optional<Long> chatId, Model model) {
         model.addAttribute("user", new RegistrationUserDto());
+        model.addAttribute("chatId", chatId);
         return "register";
     }
 
     @PostMapping("/register")
     public String registerNewUser(
+            @RequestParam(required = false) Optional<Long> chatId,
             @ModelAttribute("user") @Valid RegistrationUserDto userDto,
             BindingResult bindingResult,
             Model model
     ) {
         if (bindingResult.hasErrors()) {
+            model.addAttribute("chatId", chatId);
             return "register";
         }
 
         try {
             authService.createNewUser(userDto);
-            return "redirect:/login";
+            return chatId.map(id -> "redirect:/login?chatId=" + id)
+                    .orElse("redirect:/login");
         } catch (Exception e) {
             model.addAttribute("error", e.getMessage());
+            model.addAttribute("chatId", chatId);
             return "register";
         }
     }
