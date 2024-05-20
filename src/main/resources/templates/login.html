@@ -58,10 +58,22 @@
             border-radius: 5px;
             font-weight: bold;
             cursor: pointer;
+            margin-top: 10px;
         }
 
         button:hover {
             background-color: #0056b3;
+        }
+
+        .register-link {
+            font-size: 14px;
+            margin-top: 10px;
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .register-link:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -77,12 +89,15 @@
             <label for="password">Password:</label>
             <input type="password" id="password" name="password" required>
         </div>
-        <input type="hidden" name="chatId" th:value="${chatId.isPresent() ? chatId.get() : ''}">
+        <input type="hidden" name="chatId" th:if="${chatId.isPresent()}" th:value="${chatId.get()}">
         <div th:if="${param.error}" class="error">Invalid username or password</div>
         <div>
             <button type="submit">Login</button>
         </div>
     </form>
+    <div class="register-link">
+        <p>Don't have an account? <a th:if="${chatId.isPresent()}" th:href="@{/register(chatId=${chatId.get()})}" th:text="Register">Register</a><a th:if="${!chatId.isPresent()}" th:href="@{/register}" th:text="Register">Register</a></p>
+    </div>
 </div>
 </body>
 </html>
