@@ -21,5 +21,6 @@ public class Hackaton2023Application {
         } catch (TelegramApiException ignored) {
         }
     }
+    // test
 
 }
